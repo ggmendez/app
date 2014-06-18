@@ -39,26 +39,26 @@ function objectMousedown(option, targetObject) {
 
 
 function objectMouseup(option, targetObject) {
+
+
     
-    
-    console.log("objectMouseup:");
-    console.log(option);
-    
-    
-    
+
+
+    console.log("FUNCTION objectMouseup:");
+
+//    console.log("option:");
+//    console.log(option);
+
+
+
     var theEvent = option;
     if (fabric.isTouchSupported) {
         theEvent = option['e'];
-        console.log("Touch Supported");
+//        console.log("Touch Supported");
     }
-    
-    console.log("theEvent:");
-    console.log(theEvent);
-    
-    // TODO: Esto funciona en MAC, pero no en Windows! (esto debe ser revisado).
-    theEvent = option['e']; 
-    
-    
+
+//    console.log("theEvent:");
+//    console.log(theEvent);
 
     if (targetObject.movingOpacity) {
         targetObject.opacity = targetObject.permanentOpacity;
@@ -67,36 +67,52 @@ function objectMouseup(option, targetObject) {
     }
 
     if (targetObject.type == "importedImage") {
-
-//        var theEvent = option['e'];
-
+        
         if (theEvent) {
 
-            var coordY = theEvent.offsetY;
-            var coordX = theEvent.offsetX;
+            // coordX and coordY are the points of the clic relative to the canvas
+//            var coordY = theEvent.offsetY;
+//            var coordX = theEvent.offsetX;
+//
+////            console.log("coordX BEFORE: " + coordX);
+////            console.log("coordY BEFORE: " + coordY);
+//
+//            if (fabric.isTouchSupported && theEvent.changedTouches && theEvent.changedTouches.length > 0) {
+//                // Here I use the changedTouches list since the up event produces a change in it
+//                coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
+//                coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
+//            }
+//
+////            console.log("coordX AFTER: " + coordX);
+////            console.log("coordY AFTER: " + coordY);
+//
+//            var localPoint = targetObject.toLocalPoint(new fabric.Point(coordX, coordY), 'left', 'top');
 
-            if (fabric.isTouchSupported && theEvent.touches && theEvent.touches.length > 0) {
-                coordX = theEvent.touches[0].pageX - $('#theCanvas').offset().left;
-                coordY = theEvent.touches[0].pageY - $('#theCanvas').offset().top;
-            }
+//
+////            console.log(localPoint);
+//
+//
+//            // relativeX and relativeY are points local to the top left corner of the target object
+//            var relativeX = localPoint.x;
+//            var relativeY = localPoint.y;
+            
+            
+            
+            
+            var localPointer = targetObject.getLocalPointer(option['e']);
+            console.log("localPointer");
+            console.log(localPointer);
+            
+            
+            var relativeX = localPointer.x;
+            var relativeY = localPointer.y;
 
-
-            console.log("coordX: " + coordX);
-            console.log("coordY: " + coordY);
-
-            var localPoint = targetObject.toLocalPoint(new fabric.Point(coordX, coordY), 'left', 'top');
-
-//            console.log(localPoint);
-
-
-
-            var relativeX = localPoint.x;
-            var relativeY = localPoint.y;
-
-
-
-//            console.log("relativeX: " + relativeX);
-//            console.log("relativeY: " + relativeY);
+            console.log("relativeX: " + relativeX);
+            console.log("relativeY: " + relativeY);
+            
+            
+            
+            
 
 
             var request = new XMLHttpRequest(); // create a new request object to send to server
@@ -125,79 +141,76 @@ function objectMouseup(option, targetObject) {
                                     var g = parseFloat(color['val'][1]).toFixed(0);
                                     var r = parseFloat(color['val'][2]).toFixed(0);
 
-                                    console.log(color);
-
-                                    console.log(r);
-                                    console.log(g);
-                                    console.log(b);
+//                                    console.log(color);
+//                                    console.log(r);
+//                                    console.log(g);
+//                                    console.log(b);
 
                                     var massCenter = response['massCenter'];
 
                                     var x = massCenter['x'];
                                     var y = massCenter['y'];
 
-                                    var path = new fabric.Path(pathString);
+                                    var widget = new fabric.Path(pathString);
 
 
-                                    var clickPoint = new fabric.Point(localPoint.x + (targetObject.left - targetObject.width / 2), localPoint.y + (targetObject.top - targetObject.height / 2));
-//                                    drawRectAt(clickPoint, 'green');
-
+                                    var clickPoint = new fabric.Point(localPointer.x + (targetObject.left - targetObject.width / 2), localPointer.y + (targetObject.top - targetObject.height / 2));
                                     var initialX = clickPoint.x;
                                     var initialY = clickPoint.y;
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
 //                                    console.log("initialX: " + initialX);
 //                                    console.log("initialY: " + initialY);
 
-                                    var finalX = x + (targetObject.left - targetObject.width / 2) + path.width / 2;
-                                    var finalY = y + (targetObject.top - targetObject.height / 2) + path.height / 2;
+                                    var finalX = x + (targetObject.left - targetObject.width / 2) + widget.width / 2;
+                                    var finalY = y + (targetObject.top - targetObject.height / 2) + widget.height / 2;
 //                                    drawRectAt(new fabric.Point(finalX, finalY), 'red');
 //                                    console.log("finalX: " + finalX);
 //                                    console.log("finalY: " + finalY);
 
-                                    path.set({left: initialX, top: initialY, originX: 'center', originY: 'center', scaleX: 0.1, scaleY: 0.1});
-                                    path.stroke = 'red';
-                                    path.strokeWidth = 2;
-                                    path.strokeDashArray = [5, 5];
-//                                    path.fill = 'transparent';
-                                    path.fill = 'rgb(' + r + ', ' + g + ', ' + b + ')';
-//                                    path.hasControls = false;
-//                                    path.hasBorders = false;
-//                                    path.selectable = false;
-//                                    path.lockRotation = true;
-//                                    path.lockScalingX = true;
-//                                    path.lockScalingY = true;
-//                                    path.hasRotatingPoint = false;
-                                    path.opacity = 1;
-                                    path.permanentOpacity = path.opacity;
-                                    path.movingOpacity = 0.3;
+                                    widget.set({left: initialX, top: initialY, originX: 'center', originY: 'center', scaleX: 0.1, scaleY: 0.1});
+                                    widget.stroke = 'red';
+                                    widget.strokeWidth = 2;
+                                    widget.strokeDashArray = [5, 5];
+//                                    widget.fill = 'transparent';
+                                    widget.fill = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+//                                    widget.hasControls = false;
+//                                    widget.hasBorders = false;
+//                                    widget.selectable = false;
+//                                    widget.lockRotation = true;
+//                                    widget.lockScalingX = true;
+//                                    widget.lockScalingY = true;
+//                                    widget.hasRotatingPoint = false;
+                                    widget.opacity = 1;
+                                    widget.permanentOpacity = widget.opacity;
+                                    widget.movingOpacity = 0.3;
 
-                                    path.borderColor = '#CC3333';
-                                    path.cornerColor = '#FFCC00';
-                                    path.transparentCorners = false;
+                                    widget.borderColor = '#CC3333';
+                                    widget.cornerColor = '#FFCC00';
+                                    widget.transparentCorners = false;
 
-//                                    var top = path.top - path.height/2;
-//                                    var left = path.left;
-//                                    
-//                                    path.left = left + path.width/2;
-//                                    path.top = top + path.height/2;
-//
-//                                    path.scaleX = 0.1;
-//                                    path.scaleY = 0.1;
+                                    canvas.add(widget);
 
-                                    canvas.add(path);
+                                    animatePath(widget, finalY, finalX, 500);
 
-                                    animatePath(path, finalY, finalX, 500);
-
-                                    path.on({
+                                    widget.on({
                                         'mouseup': function(option) {
-                                            widgetMouseup(option, path);
-                                        }, 
+                                            widgetMouseup(option, widget);
+                                        },
                                         'moving': function(option) {
-                                            widgetMoving(option, path);
-                                        } 
+                                            widgetMoving(option, widget);
+                                        }
                                     });
 
 
 //                                    targetObject.widgets.push(path);
+                                    
+                                    
+
 
 
 

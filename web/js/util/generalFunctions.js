@@ -3,6 +3,7 @@ function generateRandomColor() {
 }
 
 function drawRectAt(point, color) {
+    console.log("FUNCTION drawRectAt");
     var rect = new fabric.Rect({
         originX: 'center',
         originY: 'center',

@@ -15,7 +15,8 @@ package classes;
 public class OpenCVLoader {
     
 //    static{ System.loadLibrary("opencv_java249"); }
-    static{ System.load("/Users/ggmendez/NetBeansProjects/OpenCVTest/lib/libopencv_java249.dylib"); }
+    static{ System.load("C:/Users/Gonzalo/Documents/NetBeansProjects/MyWebApplication/lib/opencv_java249.dll"); }
+//    static{ System.load("/Users/ggmendez/NetBeansProjects/OpenCVTest/lib/libopencv_java249.dylib"); }
 
     public OpenCVLoader() {
     }

@@ -19,6 +19,7 @@
         <script type="text/javascript" src="./js/jquery-ui-1.10.4/js/jquery.ajaxfileupload.js"></script>
         <script type="text/javascript" src="./js/jquery-ui-1.10.4/js/jquery-ui-1.10.4.js"></script>
         <script type="text/javascript" src="./js/jquery-ui-1.10.4/js/jquery-ui-1.10.4.min.js"></script>
+        <script type="text/javascript" src="./js/jquery-ui-1.10.4/js/jquery.path.js"></script>
 
 
         <script type="text/javascript" src="./js/kickstart.js"></script>

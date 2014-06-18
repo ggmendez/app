@@ -29,7 +29,8 @@ public class FaceDetector {
     public static String detectFace(String filePath) {
         
 //        String dirName = "C:/Users/ggm/Documents/NetBeansProjects/MyWebApplication";
-        String dirName = "/Users/ggmendez/Development/MyWebApplication";
+        String dirName = "C:/Users/Gonzalo/Documents/NetBeansProjects/MyWebApplication";
+//        String dirName = "/Users/ggmendez/Development/MyWebApplication";
 
         System.out.println(dirName);
 
