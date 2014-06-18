@@ -40,13 +40,18 @@ function widgetMouseup(option, targetWidget) {
 
 function animatePath(widget, top, left, duration) {
     
-    duration *= 2.5;
+
+    
 
   
 //    var easing = fabric.util.ease.easeOutExpo;
-   
-    var easing = fabric.util.ease.easeOutElastic;
-//    var easing = fabric.util.ease.easeOutBack;
+
+//    duration *= 2.5;    
+//    var easing = fabric.util.ease.easeOutElastic;
+
+
+    
+    var easing = fabric.util.ease.easeOutBack;
 //    var easing = fabric.util.ease.easeOutBounce;
    
 
