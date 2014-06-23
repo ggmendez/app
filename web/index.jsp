@@ -25,6 +25,7 @@
         <script type="text/javascript" src="./js/kickstart.js"></script>
 
 
+        <script type="text/javascript" src="./js/globals.js"></script>
         <script type="text/javascript" src="./js/interaction/canvasEvents.js"></script>
         <script type="text/javascript" src="./js/interaction/objectsEvents.js"></script>
         <script type="text/javascript" src="./js/interaction/widgetsEvents.js"></script>
@@ -272,6 +273,7 @@
                     imgInstance.centeredRotation = true;
 
                     imgInstance.type = "importedImage";
+                    imgInstance.downTouchs = 0;
                     imgInstance.widgets = new Array();
 
                     // TODO: If a widget is dragged out of its parent, this should be removed from its parent's widgets list
@@ -358,6 +360,9 @@
                     imgInstance.on('moving', function(option) {
                         objectMoving(option, imgInstance);
                     });
+                    imgInstance.on('selected', function(option) {
+                        objectSelected(option, imgInstance);
+                    });
 
                     disableDrawingMode();
 
@@ -396,10 +401,10 @@
             var lastCopiedObject = null;
 
             canvas.on({
-//                'mouse:up': function(option) {
-//                    canvasMouseUp(option);
-//                },
-                'object:moving': function(option) {
+                'mouse:up': function(option) {
+                    canvasMouseUp(option);
+                },
+                'object:moving':  function(option) {
                     canvasObjectMoving(option);
                 },
                 'object:modified': function(option) {
@@ -419,6 +424,12 @@
                 },
                 'mouse:move': function(option) {
                     canvasMouseMove(option);
+                },
+                'selection:cleared': function(option) {
+                    canvasSelectionCleared(option);
+                },
+                'selection:created': function(option) {
+                    canvasSelectionCreated(option);
                 }
             });
 

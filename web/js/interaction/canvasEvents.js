@@ -1,6 +1,28 @@
+function canvasSelectionCleared(option) {
+    console.log("canvasSelectionCleared");
+    var activeObject = option.target;
+    if (activeObject.type == "widget") {
+        widget = activeObject;
+        widget.stroke = 'red';
+        widget.strokeWidth = 10;
+        widget.strokeDashArray = [5, 5];
+    }
+}
+
+function canvasSelectionCreated(option) {
+    console.log("canvasSelectionCreated");
+    var activeObject = option.target;
+    if (activeObject.type == "widget") {
+        widget = activeObject;
+        widget.stroke = 'black';
+        widget.strokeWidth = 10;
+        widget.strokeDashArray = [5, 5];
+    }
+}
+
 function canvasObjectModified(option) {
 
-    console.log("canvasObjectModified");
+//    console.log("canvasObjectModified");
 
 
 }
@@ -110,9 +132,9 @@ function canvasObjectScaling(option) {
 
 function canvasObjectMoving(option) {
 
-    console.log("canvasObjectMoving");
-    
-    var obj = option.target;
+//    console.log("canvasObjectMoving");
+
+//    var targetObject = option.target;
 //
 //    if (obj.movingOpacity) {
 //        obj.opacity = obj.movingOpacity;
@@ -120,25 +142,7 @@ function canvasObjectMoving(option) {
 //        obj.opacity = 0.65;
 //    }
 
-    if (obj.type == "importedImage") {
-        var currentX = option.target.left;
-        var currentY = option.target.top;
-        var arrayLength = obj.widgets.length;
-        for (var i = 0; i < arrayLength; i++) {
-            obj.widgets[i].left = obj.widgets[i].left + (currentX - previousX);
-            obj.widgets[i].top = obj.widgets[i].top + (currentY - previousY);
-            obj.widgets[i].setCoords();
-            canvas.renderAll();
-        }
-        previousAngle = option.target.angle;
-        previousX = option.target.left;
-        previousY = option.target.top;
-    } else if (obj.type.indexOf("slider") > -1) {
-        var relPos = computeRelativeLocation(obj.parentObject, obj, obj.left, obj.top);
-        obj.posRelX = relPos[0];
-        obj.posRelY = relPos[1];
-
-    }
+    
 
 
     // TODO: When a widget is moved and dropped out of its parent,
@@ -160,15 +164,17 @@ function canvasObjectSelected(option) {
         previousY = option.target.top;
         previousAngle = option.target.angle;
     }
-
-}
-
-function canvasBeforeSelectionCleared(option) {
-    console.log("canvasBeforeSelectionCleared");
 }
 
 function canvasSelectionCleared(option) {
     console.log("canvasSelectionCleared");
+    if (lastSelectedWidget != null) {
+        lastSelectedWidget.stroke = widget_stroke_color;
+        lastSelectedWidget.strokeWidth = widget_stroke_width;
+        lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
+        lastSelectedWidget.opacity = widget_opacity;
+        lastSelectedWidget = null;
+    }
 }
 
 function canvasSelectionCreated(option) {
@@ -180,19 +186,19 @@ function canvasPathCreated(option) {
 }
 
 function canvasMouseDown(option) {
-    console.log("canvasMouseDown");
+//    console.log("canvasMouseDown");
     var event = option['e'];
     event.preventDefault();
 }
 
 function canvasMouseMove(option) {
-    console.log("canvasMouseMove");
+//    console.log("canvasMouseMove");
     var event = option['e'];
     event.preventDefault();
 }
 
 function canvasMouseUp(option) {
-    console.log("canvasMouseUp");
+//    console.log("canvasMouseUp");
     var event = option['e'];
     event.preventDefault();
 //    var obj = option.target;
