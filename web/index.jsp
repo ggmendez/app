@@ -294,6 +294,11 @@
                         stroke: '#CC3333'
                     });
 
+                    imgInstance.hasControls = false;
+                    imgInstance.hasBorders = false;
+                    imgInstance.hasRotatingPoint = false;                    
+                    imgInstance.selectable = true;
+
                     canvas.add(imgInstance);
 
                     var d = new Date();
@@ -404,7 +409,7 @@
                 'mouse:up': function(option) {
                     canvasMouseUp(option);
                 },
-                'object:moving':  function(option) {
+                'object:moving': function(option) {
                     canvasObjectMoving(option);
                 },
                 'object:modified': function(option) {

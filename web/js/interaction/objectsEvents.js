@@ -58,6 +58,7 @@ function objectMoving(option, targetObject) {
 
     canvas.renderAll();
 }
+
 function objectMousedown(option, targetObject) {
     console.log("objectMousedown");
     targetObject.downTouchs++;
@@ -247,6 +248,8 @@ function objectMouseup(option, targetObject) {
             }
         }
 
+    } else {
+        canvas.discardActiveObject();
     }
 
     targetObject.downTouchs--;
