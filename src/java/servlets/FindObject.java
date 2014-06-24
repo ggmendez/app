@@ -63,7 +63,7 @@ public class FindObject extends HttpServlet {
             Scalar meanColor = finder.getMeanColor();
             Point topLeftPoint = finder.getTopLeftCorner();
                     
-            FindingResponse findingResponse = new FindingResponse(path, meanColor, topLeftPoint);
+            FindingResponse findingResponse = new FindingResponse(path, meanColor, topLeftPoint, -1, -1);
             
             Gson gson = new Gson();
             String jsonResponse = gson.toJson(findingResponse, FindingResponse.class);

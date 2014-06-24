@@ -32,6 +32,8 @@ public class FloodFiller {
     private Mat biggestContourImage = null;
     private Rect computedSearchWindow = null;
     private Point massCenter = null;
+    private int filledArea;
+    private double contourArea;
 
     public FloodFiller(Mat image) {
         this.image = image;
@@ -58,7 +60,7 @@ public class FloodFiller {
         Imgproc.threshold(mask, mask, 1, 128, Imgproc.THRESH_BINARY);
 
 //        OpenCVTest.imshow(image, "image");
-        int area = Imgproc.floodFill(image, mask, seed, newVal, ccomp, new Scalar(lo, lo, lo), new Scalar(up, up, up), flags);
+        filledArea = Imgproc.floodFill(image, mask, seed, newVal, ccomp, new Scalar(lo, lo, lo), new Scalar(up, up, up), flags);
 
 //        OpenCVTest.imshow(image, "image");
 //        OpenCVTest.imshow(mask, "mask");
@@ -97,6 +99,7 @@ public class FloodFiller {
         if (contours.size() > 0) {
 
             MatOfPoint biggestContour = contours.get(0); // getting the bigger contour
+            contourArea = Imgproc.contourArea(biggestContour);
 
             if (contours.size() > 1) {
                 biggestContour = Collections.max(contours, new ContourComparator()); // getting the biggest contour in case there are more than one
@@ -198,4 +201,54 @@ public class FloodFiller {
     public void setTopLeftCorner(Point topLeftCorner) {
         this.topLeftCorner = topLeftCorner;
     }
+
+    public Mat getContoursImage() {
+        return contoursImage;
+    }
+
+    public void setContoursImage(Mat contoursImage) {
+        this.contoursImage = contoursImage;
+    }
+
+    public Mat getBiggestContourImage() {
+        return biggestContourImage;
+    }
+
+    public void setBiggestContourImage(Mat biggestContourImage) {
+        this.biggestContourImage = biggestContourImage;
+    }
+
+    public Rect getComputedSearchWindow() {
+        return computedSearchWindow;
+    }
+
+    public void setComputedSearchWindow(Rect computedSearchWindow) {
+        this.computedSearchWindow = computedSearchWindow;
+    }
+
+    public Point getMassCenter() {
+        return massCenter;
+    }
+
+    public void setMassCenter(Point massCenter) {
+        this.massCenter = massCenter;
+    }
+
+    public int getFilledArea() {
+        return filledArea;
+    }
+
+    public void setFilledArea(int filledArea) {
+        this.filledArea = filledArea;
+    }
+
+    public double getContourArea() {
+        return contourArea;
+    }
+
+    public void setContourArea(double contourArea) {
+        this.contourArea = contourArea;
+    }
+    
+    
 }

@@ -11,13 +11,7 @@ function canvasSelectionCleared(option) {
 
 function canvasSelectionCreated(option) {
     console.log("canvasSelectionCreated");
-    var activeObject = option.target;
-    if (activeObject.type == "widget") {
-        widget = activeObject;
-        widget.stroke = 'black';
-        widget.strokeWidth = 10;
-        widget.strokeDashArray = [5, 5];
-    }
+    
 }
 
 function canvasObjectModified(option) {
@@ -159,11 +153,18 @@ function canvasObjectMoving(option) {
 
 function canvasObjectSelected(option) {
     console.log("canvasObjectSelected");
-    if (option.target.type == "importedImage") {
+    var activeObject = option.target;
+    if (activeObject.type == "importedImage") {
         previousX = option.target.left;
         previousY = option.target.top;
         previousAngle = option.target.angle;
+    } else if (activeObject.type == "widget") {
+        widget = activeObject;
+        widget.stroke = widget_selected_stroke_color;
+        widget.strokeWidth = widget_selected_stroke_width;
+        widget.strokeDashArray = widget_selected_stroke_dash_array;
     }
+    canvas.renderAll();
 }
 
 function canvasSelectionCleared(option) {
@@ -172,9 +173,9 @@ function canvasSelectionCleared(option) {
         lastSelectedWidget.stroke = widget_stroke_color;
         lastSelectedWidget.strokeWidth = widget_stroke_width;
         lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
-        lastSelectedWidget.opacity = widget_opacity;
         lastSelectedWidget = null;
     }
+    canvas.renderAll();
 }
 
 function canvasSelectionCreated(option) {

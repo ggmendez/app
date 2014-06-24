@@ -1,9 +1,9 @@
-widget_stroke_color = 'black'; 
-widget_stroke_width = 1;
-widget_stroke_dash_array = [];
-widget_opacity = 0.3;
+widget_fill_opacity = 0.5; 
 
-widget_selected_stroke_color = 'black'; 
-widget_selected_stroke_width = 2;
-widget_selected_stroke_dash_array = [5, 5];
-widget_selected_opacity = 0.6;
+widget_stroke_color = '#3d3000'; 
+widget_stroke_width = 1.5;
+widget_stroke_dash_array = [7, 7];
+
+widget_selected_stroke_color = '#ffce0a'; 
+widget_selected_stroke_width = 3;
+widget_selected_stroke_dash_array = [7, 7];

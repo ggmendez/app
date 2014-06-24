@@ -10,7 +10,6 @@ function objectSelected(option, targetObject) {
         lastSelectedWidget.stroke = widget_stroke_color;
         lastSelectedWidget.strokeWidth = widget_stroke_width;
         lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
-        lastSelectedWidget.opacity = widget_opacity;
         lastSelectedWidget = null;
     }
 }
@@ -40,10 +39,25 @@ function objectMoving(option, targetObject) {
         var currentX = targetObject.left;
         var currentY = targetObject.top;
         var arrayLength = targetObject.widgets.length;
+
+
+        // Moving all the widgets associated to this object
         for (var i = 0; i < arrayLength; i++) {
             targetObject.widgets[i].left = targetObject.widgets[i].left + (currentX - previousX);
             targetObject.widgets[i].top = targetObject.widgets[i].top + (currentY - previousY);
+            if (targetObject.widgets[i].movingOpacity) {
+                targetObject.widgets[i].opacity = targetObject.widgets[i].movingOpacity;
+            } else {
+                targetObject.widgets[i].opacity = 0.6;
+            }
             targetObject.widgets[i].setCoords();
+            // modifying all the connectors' source points that are linked to this widget
+
+            targetObject.widgets[i].connectors.forEach(function(connector) {
+                connector.set({x1: targetObject.widgets[i].left, y1: targetObject.widgets[i].top});
+            });
+
+
         }
         previousAngle = targetObject.angle;
         previousX = targetObject.left;
@@ -70,10 +84,21 @@ function objectMousedown(option, targetObject) {
 
 function objectMouseup(option, targetObject) {
 
+    console.log("objectMouseup");
+
     if (targetObject.permanentOpacity) {
         targetObject.opacity = targetObject.permanentOpacity;
     } else {
         targetObject.opacity = 1;
+    }
+
+    var arrayLength = targetObject.widgets.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (targetObject.widgets[i].permanentOpacity) {
+            targetObject.widgets[i].opacity = targetObject.widgets[i].permanentOpacity;
+        } else {
+            targetObject.widgets[i].opacity = 1;
+        }
     }
 
     if (!targetObject.moving) {
@@ -188,14 +213,17 @@ function objectMouseup(option, targetObject) {
 //                                    console.log("finalX: " + finalX);
 //                                    console.log("finalY: " + finalY);
 
+                                        widget.filledArea = parseFloat(response['filledArea']).toFixed(0);
+                                        widget.contourArea = parseFloat(response['contourArea']).toFixed(0);
+
                                         widget.set({left: initialX, top: initialY, originX: 'center', originY: 'center', scaleX: 0.1, scaleY: 0.1});
 
                                         widget.stroke = 'black';
                                         widget.strokeWidth = 2;
                                         widget.strokeDashArray = [5, 5];
 
-
-                                        widget.fill = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+                                        widget.trueColor = 'rgb(' + r + ',  ' + g + ', ' + b + ')';
+                                        widget.fill = 'rgba(' + r + ',  ' + g + ', ' + b + ', ' + widget_fill_opacity + ')';
 
                                         widget.hasControls = false;
                                         widget.hasBorders = false;
@@ -207,9 +235,11 @@ function objectMouseup(option, targetObject) {
                                         widget.lockMovementY = true;
                                         widget.selectable = true;
 
-                                        widget.opacity = 0.5;
+                                        widget.opacity = 1;
                                         widget.permanentOpacity = widget.opacity;
                                         widget.movingOpacity = 0.3;
+
+                                        widget.connectors = new Array();
 
 //                                    widget.borderColor = '#CC3333';
 //                                    widget.cornerColor = '#FFCC00';
@@ -220,6 +250,9 @@ function objectMouseup(option, targetObject) {
                                         widget.on({
                                             'mouseup': function(option) {
                                                 widgetMouseup(option, widget);
+                                            },
+                                            'mousedown': function(option) {
+                                                widgetMousedown(option, widget);
                                             },
                                             'moving': function(option) {
                                                 widgetMoving(option, widget);

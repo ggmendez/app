@@ -13,22 +13,20 @@ function widgetSelected(option, targetWidget) {
         targetWidget.stroke = widget_selected_stroke_color;
         targetWidget.strokeWidth = widget_selected_stroke_width;
         targetWidget.strokeDashArray = widget_selected_stroke_dash_array;
-        targetWidget.opacity = widget_selected_opacity;
 
         if (lastSelectedWidget != null) {
             lastSelectedWidget.stroke = widget_stroke_color;
             lastSelectedWidget.strokeWidth = widget_stroke_width;
             lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
-            lastSelectedWidget.opacity = widget_opacity;
         }
-        
+
         lastSelectedWidget = targetWidget;
     }
     canvas.renderAll();
 }
 
 function widgetModified(option, targetWidget) {
-    console.log("widgetModified"); 
+    console.log("widgetModified");
 }
 function widgetRotating(option, targetWidget) {
     console.log("widgetRotating");
@@ -37,24 +35,114 @@ function widgetScaling(option, targetWidget) {
     console.log("widgetScaling");
 }
 function widgetMoving(option, targetWidget) {
+    
     console.log("widgetMoving");
-//    if (targetWidget.movingOpacity) {
-//        targetWidget.opacity = targetWidget.movingOpacity;
-//    } else {
-//        targetWidget.opacity = 0.6;
-//    }
+    targetWidget.moving = true;
+
+    var theEvent = option;
+    if (fabric.isTouchSupported) {
+        theEvent = option['e'];
+    }        
+
+    if (theEvent) {
+
+        var coordY = theEvent.offsetY;
+        var coordX = theEvent.offsetX;
+
+        if (fabric.isTouchSupported && theEvent.changedTouches && theEvent.changedTouches.length > 0) {
+                // Here I use the changedTouches list since the up event produces a change in it
+                coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
+                coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
+            }
+
+        var connector = targetWidget.connectors[targetWidget.connectors.length - 1];        
+        connector.set({x2: coordX, y2: coordY});
+//        canvas.add(connector);
+
+        canvas.renderAll();
+
+
+    }
+
+
+
 }
 function widgetMousedown(option, targetWidget) {
+
     console.log("widgetMousedown");
+
+    var theEvent = option;
+    if (fabric.isTouchSupported) {
+        theEvent = option['e'];
+    }
+
+    if (theEvent) {
+
+        var coordY = theEvent.offsetY;
+        var coordX = theEvent.offsetX;
+
+        if (fabric.isTouchSupported && theEvent.touchess && theEvent.touches.length > 0) {
+            coordX = theEvent.touches[0].pageX - $('#theCanvas').offset().left;
+            coordY = theEvent.touches[0].pageY - $('#theCanvas').offset().top;
+        }
+
+        var coords = [targetWidget.left, targetWidget.top, coordX, coordY];
+        var newConnector = CreateDefaultConnector(coords, widget.trueColor);
+        canvas.add(newConnector);
+        newConnector.widget = targetWidget;
+        targetWidget.connectors.push(newConnector);
+        
+    }
+
 }
 
 function widgetMouseup(option, targetWidget) {
+    
     console.log("widgetMouseup");
     if (targetWidget.permanentOpacity) {
         targetWidget.opacity = targetWidget.permanentOpacity;
     } else {
         targetWidget.opacity = 1;
     }
+
+    if (targetWidget.moving) {
+
+        var theEvent = option;
+        if (fabric.isTouchSupported) {
+            theEvent = option['e'];
+        }
+
+        if (theEvent) {
+
+
+            var coordY = theEvent.offsetY;
+            var coordX = theEvent.offsetX;
+
+            if (fabric.isTouchSupported && theEvent.changedTouches && theEvent.changedTouches.length > 0) {
+                // Here I use the changedTouches list since the up event produces a change in it
+                coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
+                coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
+            }
+
+//            drawRectAt(new fabric.Point(coordX, coordY), 'red')
+
+            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1]);
+
+
+        }
+
+
+
+    } else {
+        // removing the last connector added when the widget was down clicked 
+        var connector = targetWidget.connectors.pop();
+        canvas.remove(connector);
+
+    }
+
+
+
+    targetWidget.moving = false;
     canvas.renderAll();
 }
 

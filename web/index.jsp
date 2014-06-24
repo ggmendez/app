@@ -29,7 +29,10 @@
         <script type="text/javascript" src="./js/interaction/canvasEvents.js"></script>
         <script type="text/javascript" src="./js/interaction/objectsEvents.js"></script>
         <script type="text/javascript" src="./js/interaction/widgetsEvents.js"></script>
+        <script type="text/javascript" src="./js/interaction/outputs.js"></script>
+        <script type="text/javascript" src="./js/interaction/connectors.js"></script>
         <script type="text/javascript" src="./js/util/generalFunctions.js"></script>
+        
 
 
 
@@ -358,6 +361,9 @@
 
                     imgInstance.on('mouseup', function(option) {
                         objectMouseup(option, imgInstance);
+                    });
+                    imgInstance.on('mousedown', function(option) {
+                        objectMousedown(option, imgInstance);
                     });
                     imgInstance.on('modified', function(option) {
                         objectModified(option, imgInstance);

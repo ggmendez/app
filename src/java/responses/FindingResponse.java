@@ -18,11 +18,16 @@ public class FindingResponse {
     private String path;
     private Scalar meanColor;
     private Point massCenter;
+    private int filledArea;
+    private double contourArea;
+    
 
-    public FindingResponse(String path, Scalar meanColor, Point center) {
+    public FindingResponse(String path, Scalar meanColor, Point center, int filledArea, double contourArea) {
         this.path = path;
         this.meanColor = meanColor;
         this.massCenter = center;
+        this.filledArea = filledArea;
+        this.contourArea = contourArea;
     }
     
     public String getPath() {
@@ -48,5 +53,20 @@ public class FindingResponse {
     public void setMassCenter(Point massCenter) {
         this.massCenter = massCenter;
     }
-    
+
+    public int getFilledArea() {
+        return filledArea;
+    }
+
+    public void setFilledArea(int filledArea) {
+        this.filledArea = filledArea;
+    }
+
+    public double getContourArea() {
+        return contourArea;
+    }
+
+    public void setContourArea(double contourArea) {
+        this.contourArea = contourArea;
+    }
 }

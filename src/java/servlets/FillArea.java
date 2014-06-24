@@ -50,9 +50,6 @@ public class FillArea extends HttpServlet {
 
             Mat image = ImageLoader.loadImage(imageFileName);
             
-            
-            
-
             FloodFiller floodFiller = new FloodFiller(image);
             Point from = new Point(x, y);
             int lo = 60;
@@ -62,8 +59,11 @@ public class FillArea extends HttpServlet {
 
             Scalar meanColor = floodFiller.getMeanColor();
             Point topLeftPoint = floodFiller.getTopLeftCorner();
+            
+            int filledArea = floodFiller.getFilledArea();
+            double contourArea = floodFiller.getContourArea();            
 
-            FindingResponse findingResponse = new FindingResponse(path, meanColor, topLeftPoint);
+            FindingResponse findingResponse = new FindingResponse(path, meanColor, topLeftPoint, filledArea, contourArea);
 
             Gson gson = new Gson();
             String jsonResponse = gson.toJson(findingResponse, FindingResponse.class);
