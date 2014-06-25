@@ -7,6 +7,9 @@ function CreateDefaultConnector(coords, color) {
         selectable: false,
         strokeLineJoin: 'round',
         strokeWidth: 2,
-        opacity: 1
+        opacity: 1,
+        originX: 'center',
+        originY: 'center'
+
     });
 }

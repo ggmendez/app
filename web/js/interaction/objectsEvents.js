@@ -55,6 +55,7 @@ function objectMoving(option, targetObject) {
 
             targetObject.widgets[i].connectors.forEach(function(connector) {
                 connector.set({x1: targetObject.widgets[i].left, y1: targetObject.widgets[i].top});
+                positionConfigurator(connector);
             });
 
 

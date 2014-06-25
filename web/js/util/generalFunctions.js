@@ -1,3 +1,10 @@
+fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
+    return {
+        left: object.left + this._offset.left,
+        top: object.top + this._offset.top
+    };
+}
+
 function generateRandomColor() {
     return "#" + ((1 << 24) * Math.random() | 0).toString(16);
 }

@@ -22,17 +22,14 @@
         <script type="text/javascript" src="./js/jquery-ui-1.10.4/js/jquery.path.js"></script>
 
 
+
+
         <script type="text/javascript" src="./js/kickstart.js"></script>
 
 
-        <script type="text/javascript" src="./js/globals.js"></script>
-        <script type="text/javascript" src="./js/interaction/canvasEvents.js"></script>
-        <script type="text/javascript" src="./js/interaction/objectsEvents.js"></script>
-        <script type="text/javascript" src="./js/interaction/widgetsEvents.js"></script>
-        <script type="text/javascript" src="./js/interaction/outputs.js"></script>
-        <script type="text/javascript" src="./js/interaction/connectors.js"></script>
-        <script type="text/javascript" src="./js/util/generalFunctions.js"></script>
-        
+
+
+
 
 
 
@@ -47,6 +44,17 @@
         <!-- include the core styles -->
         <link rel="stylesheet" href="./js/alertify.js-0.3.11/themes/alertify.core.css" />
         <link rel="stylesheet" href="./js/alertify.js-0.3.11/themes/alertify.default.css" />
+
+        <script type="text/javascript" src="./js/globals.js"></script>
+        <script type="text/javascript" src="./js/util/generalFunctions.js"></script>
+        <script type="text/javascript" src="./js/interaction/canvasEvents.js"></script>
+        <script type="text/javascript" src="./js/interaction/objectsEvents.js"></script>
+        <script type="text/javascript" src="./js/interaction/widgetsEvents.js"></script>
+        <script type="text/javascript" src="./js/interaction/outputs.js"></script>
+        <script type="text/javascript" src="./js/interaction/connectors.js"></script>
+
+        <link rel="stylesheet" type="text/css" href="./css/tooltipster.css" />
+        <script type="text/javascript" src="./js/tooltipster/js/jquery.tooltipster.js"></script>
 
         <% new OpenCVLoader();%>
 
@@ -237,6 +245,11 @@
 
         <script>
 
+            $(document).ready(function() {
+                $('.tooltip').tooltipster();
+            });
+
+
             // global variables
             var previousX = null;
             var previousY = null;
@@ -299,7 +312,7 @@
 
                     imgInstance.hasControls = false;
                     imgInstance.hasBorders = false;
-                    imgInstance.hasRotatingPoint = false;                    
+                    imgInstance.hasRotatingPoint = false;
                     imgInstance.selectable = true;
 
                     canvas.add(imgInstance);

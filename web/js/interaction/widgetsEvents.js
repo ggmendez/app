@@ -123,9 +123,7 @@ function widgetMouseup(option, targetWidget) {
                 coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
-
-//            drawRectAt(new fabric.Point(coordX, coordY), 'red')
-
+            
             addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1]);
 
 
