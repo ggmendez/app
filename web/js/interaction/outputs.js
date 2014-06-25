@@ -95,8 +95,8 @@ function positionConfigurator(connector) {
 //    configurator.css('left', (absCoords.left - width / 2) + 'px');
 
 
-    configurator.css('top', (connector.getCenterPoint().y + $('#theCanvas').offset().top - height/2 - 2.5) + 'px');
-    configurator.css('left', (connector.getCenterPoint().x + $('#theCanvas').offset().left - width/2 - 2.5) + 'px');
+    configurator.css('top', (connector.getCenterPoint().y + $('#theCanvas').offset().top - height / 2 - 2.5) + 'px');
+    configurator.css('left', (connector.getCenterPoint().x + $('#theCanvas').offset().left - width / 2 - 2.5) + 'px');
 
 }
 
@@ -111,8 +111,22 @@ function addConfigurator(connector) {
 
     document.body.appendChild(configurator[0]);
 
+    var outputShapes = {
+        'Circle': 'Circle',
+        'Vertical Rect': 'Vertical Rect',
+        'Horizontal Rect': 'Horizontal Rect',
+        'Square': 'baz'
+    }
+
+    var outputShapeSelection = $('<select />');
+
+    for (var val in outputShapes) {
+        $('<option />', {value: val, text: outputShapes[val]}).appendTo(outputShapeSelection);
+    }
+
     configurator.tooltipster({
-        content: $('<span><img src="http://blogs.denmark.dk/natalia/files/2012/04/working.jpg" /> <strong>This text is in bold case !</strong></span>'),
+//        content: $('<span><img src="http://blogs.denmark.dk/natalia/files/2012/04/working.jpg" /> <strong>This text is in bold case !</strong></span>'),
+        content: outputShapeSelection,
         animation: 'grow',
         trigger: 'click',
         interactive: true
