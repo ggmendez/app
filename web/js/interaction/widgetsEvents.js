@@ -124,8 +124,18 @@ function widgetMouseup(option, targetWidget) {
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
             
-            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1]);
+//            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
+//            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
+//            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
+//            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
 
+
+            
+            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, CIRCULAR_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, MINIATURE_OUTPUT);
 
         }
 

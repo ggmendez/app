@@ -6,10 +6,9 @@ function CreateDefaultConnector(coords, color) {
         perPixelTargetFind: true,
         selectable: false,
         strokeLineJoin: 'round',
-        strokeWidth: 2,
+        strokeWidth: 1,
         opacity: 1,
         originX: 'center',
         originY: 'center'
-
     });
 }

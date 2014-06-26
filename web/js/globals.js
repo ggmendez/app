@@ -1,3 +1,13 @@
+/* TYPES */
+
+HORIZONTAL_RECTANGULAR_OUTPUT = 'Horizontal Rect';
+VERTICAL_RECTANGULAR_OUTPUT = 'Vertical Rect';
+SQUARED_OUTPUT = 'Square';
+CIRCULAR_OUTPUT = 'Circle';
+TRIANGULAR_OUTPUT = 'Triangle';
+MINIATURE_OUTPUT = 'Miniature';
+
+
 widget_fill_opacity = 0.5; 
 
 widget_stroke_color = '#3d3000'; 
