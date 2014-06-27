@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <servlet>
+        <servlet-name>FaceDetector</servlet-name>
+        <servlet-class>servlets.FaceDetector</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UploadFile</servlet-name>
+        <servlet-class>servlets.UploadFile</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FindObject</servlet-name>
+        <servlet-class>servlets.FindObject</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>FillArea</servlet-name>
+        <servlet-class>servlets.FillArea</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FaceDetector</servlet-name>
+        <url-pattern>/FaceDetector</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UploadFile</servlet-name>
+        <url-pattern>/UploadFile</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FindObject</servlet-name>
+        <url-pattern>/FindObject</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>FillArea</servlet-name>
+        <url-pattern>/FillArea</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>

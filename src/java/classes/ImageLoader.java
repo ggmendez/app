@@ -19,8 +19,8 @@ public class ImageLoader {
     public static Mat loadImage (String imageFileName) {
   
         // TODO: This path should be saved in a configuration file
-//        File path = new File("/Users/ggmendez/Development/MyWebApplication/uploads");
-        File path = new File("C:/Users/Gonzalo/Documents/NetBeansProjects/MyWebApplication/uploads");
+        File path = new File("/Users/ggmendez/Development/app/app/uploads");
+//        File path = new File("C:/Users/Gonzalo/Documents/NetBeansProjects/MyWebApplication/uploads");
         String fileName = path + "/" + imageFileName;
         System.out.println("fileName: " + fileName);
         Mat image = Highgui.imread(fileName);
