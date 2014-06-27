@@ -241,6 +241,8 @@ function objectMouseup(option, targetObject) {
                                         widget.movingOpacity = 0.3;
 
                                         widget.connectors = new Array();
+                                        
+                                        widget.isWidget = true;
 
 //                                    widget.borderColor = '#CC3333';
 //                                    widget.cornerColor = '#FFCC00';

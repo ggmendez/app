@@ -35,14 +35,14 @@ function widgetScaling(option, targetWidget) {
     console.log("widgetScaling");
 }
 function widgetMoving(option, targetWidget) {
-    
+
     console.log("widgetMoving");
     targetWidget.moving = true;
 
     var theEvent = option;
-    if (fabric.isTouchSupported) {
-        theEvent = option['e'];
-    }        
+//    if (fabric.isTouchSupported) {
+    theEvent = option['e'];
+//    }        
 
     if (theEvent) {
 
@@ -50,12 +50,12 @@ function widgetMoving(option, targetWidget) {
         var coordX = theEvent.offsetX;
 
         if (fabric.isTouchSupported && theEvent.changedTouches && theEvent.changedTouches.length > 0) {
-                // Here I use the changedTouches list since the up event produces a change in it
-                coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
-                coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
-            }
+            // Here I use the changedTouches list since the up event produces a change in it
+            coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
+            coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
+        }
 
-        var connector = targetWidget.connectors[targetWidget.connectors.length - 1];        
+        var connector = targetWidget.connectors[targetWidget.connectors.length - 1];
         connector.set({x2: coordX, y2: coordY});
 //        canvas.add(connector);
 
@@ -72,9 +72,9 @@ function widgetMousedown(option, targetWidget) {
     console.log("widgetMousedown");
 
     var theEvent = option;
-    if (fabric.isTouchSupported) {
-        theEvent = option['e'];
-    }
+//    if (fabric.isTouchSupported) {
+    theEvent = option['e'];
+//    }
 
     if (theEvent) {
 
@@ -91,13 +91,13 @@ function widgetMousedown(option, targetWidget) {
         canvas.add(newConnector);
         newConnector.widget = targetWidget;
         targetWidget.connectors.push(newConnector);
-        
+
     }
 
 }
 
 function widgetMouseup(option, targetWidget) {
-    
+
     console.log("widgetMouseup");
     if (targetWidget.permanentOpacity) {
         targetWidget.opacity = targetWidget.permanentOpacity;
@@ -108,9 +108,9 @@ function widgetMouseup(option, targetWidget) {
     if (targetWidget.moving) {
 
         var theEvent = option;
-        if (fabric.isTouchSupported) {
-            theEvent = option['e'];
-        }
+//        if (fabric.isTouchSupported) {
+        theEvent = option['e'];
+//        }
 
         if (theEvent) {
 
@@ -123,18 +123,19 @@ function widgetMouseup(option, targetWidget) {
                 coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
-            
+
 //            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
 
 
-            
-            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, CIRCULAR_OUTPUT);
+
+//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, CIRCULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
+            addOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, TRIANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, MINIATURE_OUTPUT);
 
         }
@@ -296,6 +297,12 @@ function animateWidget(widget, top, left, duration) {
 }
 
 
-function applyWidgetStyle(widget) {
-
+function removeWidget(widget) {
+    widget.connectors.forEach(function(connector) {
+        removeOutput(connector.output);
+    });
+    canvas.remove(widget);
 }
+
+
+

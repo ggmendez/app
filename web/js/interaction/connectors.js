@@ -9,6 +9,18 @@ function CreateDefaultConnector(coords, color) {
         strokeWidth: 1,
         opacity: 1,
         originX: 'center',
-        originY: 'center'
+        originY: 'center',
+        isConnector: true
     });
+}
+
+function removeConnector (connector) {
+    // removing the configurator associated to this connector    
+    connector.configurator.remove();
+    canvas.remove(connector);
+    
+    if (connector.output != null){
+        removeOutput(connector.output);
+    }
+    
 }

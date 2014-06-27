@@ -5,6 +5,7 @@ VERTICAL_RECTANGULAR_OUTPUT = 'Vertical Rect';
 SQUARED_OUTPUT = 'Square';
 CIRCULAR_OUTPUT = 'Circle';
 TRIANGULAR_OUTPUT = 'Triangle';
+POLYGONAL_OUTPUT = 'Polygon';
 MINIATURE_OUTPUT = 'Miniature';
 
 
