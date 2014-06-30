@@ -701,17 +701,32 @@
                     alertify.confirm("Are you sure you want to remove the selected object?", function(e) {
                         if (e) {
                             var obj = canvas.getActiveObject();
-                            canvas.remove(obj);
-                            if (obj.parentObject) {
-                                var index = obj.parentObject.widgets.indexOf(obj);
-                                if (index > -1) {
-                                    obj.parentObject.widgets.splice(index, 1);
-                                    obj.parentObject = null;
-                                }
+
+
+                            // If we are removing a widget, we should also remove the connectors associated to it
+                            if (obj.isWidget) {
+                                removeWidget (obj);
+                            } else if (obj.isOutput) {
+                                removeOutput(obj, null);
+                            } else if (obj.isConnector) {
+                                removeConnector(obj);
                             }
 
 
+
+//                            canvas.remove(obj);
+//                            if (obj.parentObject) {
+//                                var index = obj.parentObject.widgets.indexOf(obj);
+//                                if (index > -1) {
+//                                    obj.parentObject.widgets.splice(index, 1);
+//                                    obj.parentObject = null;
+//                                }
+//                            }
+
+
+                            canvas.renderAll();
                             alertify.log("Object removed", "", 3000);
+                            
                         }
                     });
                 } else {
