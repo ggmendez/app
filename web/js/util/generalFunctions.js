@@ -1,3 +1,7 @@
+function getLastElementOfArray(array) {
+    return array[array.length-1];
+}
+
 fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
     return {
         left: object.left + this._offset.left,

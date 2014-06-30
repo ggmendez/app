@@ -14,10 +14,20 @@ function widgetSelected(option, targetWidget) {
         targetWidget.strokeWidth = widget_selected_stroke_width;
         targetWidget.strokeDashArray = widget_selected_stroke_dash_array;
 
+//        targetWidget.connectors.forEach(function(connector) {
+//            console.log(connector.configurator);
+//            connector.configurator.show();
+//        });
+
+
         if (lastSelectedWidget != null) {
             lastSelectedWidget.stroke = widget_stroke_color;
             lastSelectedWidget.strokeWidth = widget_stroke_width;
             lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
+
+//            lastSelectedWidget.connectors.forEach(function(connector) {
+//                connector.configurator.hide();
+//            });
         }
 
         lastSelectedWidget = targetWidget;
@@ -41,7 +51,7 @@ function widgetMoving(option, targetWidget) {
 
     var theEvent = option;
 //    if (fabric.isTouchSupported) {
-        theEvent = option['e'];
+    theEvent = option['e'];
 //    }        
 
     if (theEvent) {
@@ -67,13 +77,14 @@ function widgetMoving(option, targetWidget) {
 
 
 }
+
 function widgetMousedown(option, targetWidget) {
 
     console.log("widgetMousedown");
 
     var theEvent = option;
 //    if (fabric.isTouchSupported) {
-        theEvent = option['e'];
+    theEvent = option['e'];
 //    }
 
     if (theEvent) {
@@ -124,7 +135,13 @@ function widgetMouseup(option, targetWidget) {
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
 
-//            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
+
+            var existingOutput = getOutputContaining(coordX, coordY);
+
+            // The mouse up event is done over a blank section of the canvas
+            if (existingOutput == null) {
+
+                //            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
@@ -135,8 +152,25 @@ function widgetMouseup(option, targetWidget) {
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
-            addOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, TRIANGULAR_OUTPUT);
+                addOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, TRIANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, MINIATURE_OUTPUT);
+
+
+
+
+
+            } else {
+                // if the mouse up event happens over an existing output
+                
+                var connector = getLastElementOfArray(targetWidget.connectors);
+                addConnectorToOutput (existingOutput, connector);
+
+
+            }
+
+
+
+
 
         }
 
@@ -306,3 +340,13 @@ function removeWidget(widget) {
 
 
 
+function getOutputContaining(x, y) {
+    var theObject = null;
+    canvas.forEachObject(function(object) {
+        var point = new fabric.Point(x, y);
+        if (object.isOutput && object.containsPoint(point)) {
+            theObject = object;
+        }
+    });
+    return theObject;
+}

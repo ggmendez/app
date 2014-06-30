@@ -1,13 +1,41 @@
+var lastTime;
+
+function outputMouseUp(option, output) {
+    var date = new Date();
+    var now = date.getTime();
+    if(now - lastTime < 500){
+        outputDoubleClicked(option, output);
+    }
+    lastTime = now;
+}
+
+function outputDoubleClicked(option, output) {
+    output.configurator.tooltipster('show');
+}
+
+function outputSelected(option, output) {
+    output.connectors.forEach(function(connector) {
+        canvas.setActiveObject(connector.widget);
+    });
+}
+
 function outputMoving(option, output) {
     console.log("outputMoving");
-    output.connector.set({x2: output.left, y2: output.top});
-    positionConfigurator(output.connector);
+    output.connectors.forEach(function(connector) {
+        connector.set({x2: output.left, y2: output.top});
+        positionConnectorConfigurator(connector);
+        positionOutputConfigurator(output);
+    });
     canvas.renderAll();
 }
 
 function outputModified(option, output) {
     console.log("outputModified");
-    output.connector.set({x2: output.left, y2: output.top});
+    output.connectors.forEach(function(connector) {
+        connector.set({x2: output.left, y2: output.top});
+        positionConnectorConfigurator(connector);
+        positionOutputConfigurator(output);
+    });
     canvas.renderAll();
 }
 
@@ -26,7 +54,8 @@ function createCircularOutput(x, y, r, color) {
         hasBorders: false,
         hasRotatingPoint: false,
         isOutput: true,
-        selectable: true
+        selectable: true,
+        connectors: new Array()
     });
 }
 
@@ -45,7 +74,8 @@ function createRectangularOutput(x, y, w, h, color) {
         hasBorders: false,
         hasRotatingPoint: false,
         isOutput: true,
-        selectable: true
+        selectable: true,
+        connectors: new Array()
     });
 }
 
@@ -64,7 +94,8 @@ function createPolygonalOutput(x, y, points, color) {
         hasBorders: false,
         hasRotatingPoint: false,
         isOutput: true,
-        selectable: true
+        selectable: true,
+        connectors: new Array()
     });
 }
 
@@ -77,32 +108,29 @@ function addCircularOutput(x, y, widget, connector, shouldAddConfigurator) {
     var output = createCircularOutput(x, y, initialRadius, widget.trueColor);
     output.type = CIRCULAR_OUTPUT;
     output.widget = widget;
-    output.connector = connector;
+//    output.connector = connector;
     connector.output = output;
 
-    output.on({
-        'moving': function(option) {
-            outputMoving(option, output);
-        },
-        'modified': function(option) {
-            outputModified(option, output);
-        }
-    });
+    associateOutputEvents(output);
 
     canvas.add(output);
 
+    output.connectors.push(connector);
+
     if (shouldAddConfigurator) {
-        addConfigurator(output.connector);
+        addConfigurator(getLastElementOfArray(output.connectors));
     }
 
-    animateCircularOutput(output, finalRadius, duration, false, null);
+    animateCircularOutput(output, connector, finalRadius, duration, false, null);
+
+    return output;
 }
 
-function animateCircularOutput(output, radius, duration, sendToBack, actionType, newType) {
+function animateCircularOutput(output, connector, radius, duration, sendToBack, actionType, newType) {
 
     var coordX = output.left;
     var coordY = output.top;
-    var targetWidget = output.connector.widget;
+    var targetWidget = connector.widget;
 
     var easing = fabric.util.ease['easeOutElastic'];
 
@@ -121,23 +149,25 @@ function animateCircularOutput(output, radius, duration, sendToBack, actionType,
             output.scaleY = 1;
             if (actionType == "REMOVING") {
                 deleteConnectors(output);
+            } else if (actionType == "ADDING") {
+                addOutputDIV(output);
             }
         },
         easing: easing
     });
 
     if (newType != null) {
-        addOutput(coordX, coordY, targetWidget, output.connector, false, newType);
+        addOutput(coordX, coordY, targetWidget, connector, false, newType);
     }
 
 
 }
 
-function animateRectangularOutput(output, width, height, duration, sendToBack, actionType, newType) {
+function animateRectangularOutput(output, connector, width, height, duration, sendToBack, actionType, newType) {
 
     var coordX = output.left;
     var coordY = output.top;
-    var targetWidget = output.connector.widget;
+    var targetWidget = connector.widget;
 
     var easing = fabric.util.ease['easeOutBounce'];
 
@@ -161,6 +191,8 @@ function animateRectangularOutput(output, width, height, duration, sendToBack, a
             output.scaleY = 1;
             if (actionType == "REMOVING") {
                 deleteConnectors(output);
+            } else if (actionType == "ADDING") {
+                addOutputDIV(output);
             }
 
         },
@@ -168,15 +200,15 @@ function animateRectangularOutput(output, width, height, duration, sendToBack, a
     });
 
     if (newType != null) {
-        addOutput(coordX, coordY, targetWidget, output.connector, false, newType);
+        addOutput(coordX, coordY, targetWidget, connector, false, newType);
     }
 }
 
-function animateMiniatureOutput(output, scaleX, scaleY, duration, sendToBack, actionType, newType) {
+function animateMiniatureOutput(output, connector, scaleX, scaleY, duration, sendToBack, actionType, newType) {
 
     var coordX = output.left;
     var coordY = output.top;
-    var targetWidget = output.connector.widget;
+    var targetWidget = connector.widget;
 
     var easing = fabric.util.ease['easeOutBounce'];
 
@@ -198,42 +230,43 @@ function animateMiniatureOutput(output, scaleX, scaleY, duration, sendToBack, ac
             }
             if (actionType == "REMOVING") {
                 deleteConnectors(output);
+            } else if (actionType == "ADDING") {
+                addOutputDIV(output);
             }
         },
         easing: easing
     });
 
     if (newType != null) {
-        addOutput(coordX, coordY, targetWidget, output.connector, false, newType);
+        addOutput(coordX, coordY, targetWidget, connector, false, newType);
     }
 }
 
 
-function positionConfigurator(connector) {
+function positionConnectorConfigurator(connector) {
 
     var configurator = connector.configurator;
 
     var width = configurator.width();
     var height = configurator.height();
 
-//    console.log("width: " + width);
-//    console.log("height: " + height);
-
-
-//    drawRectAt(connector.getCenterPoint(), 'red');
-
-//    var absCoords = canvas.getAbsoluteCoords(connector);
-
-//    drawRectAt(new fabric.Point(absCoords.left, absCoords.top), 'yellow');
-
     configurator.css('position', 'absolute');
-//    configurator.css('top', (absCoords.top - height / 2) + 'px');
-//    configurator.css('left', (absCoords.left - width / 2) + 'px');
-
 
     configurator.css('top', (connector.getCenterPoint().y + $('#theCanvas').offset().top - height / 2 - 2.5) + 'px');
     configurator.css('left', (connector.getCenterPoint().x + $('#theCanvas').offset().left - width / 2 - 2.5) + 'px');
+    
+    configurator.tooltipster('reposition');
 
+} 
+
+function positionOutputConfigurator (output) {
+    var outputDIV = output.configurator; 
+    outputDIV.css('position', 'absolute');
+    outputDIV.css('top', (output.getCenterPoint().y + $('#theCanvas').offset().top - output.getHeight() / 2) + 'px');
+    outputDIV.css('left', (output.getCenterPoint().x + $('#theCanvas').offset().left - output.getWidth() / 2) + 'px');
+    outputDIV.css('z-index', '-1');
+    outputDIV.tooltipster('reposition');
+    
 }
 
 function addConfigurator(connector) {
@@ -288,44 +321,104 @@ function addConfigurator(connector) {
         trigger: 'click',
         interactive: true
     });
+
+
+
     connector.configurator = configurator;
 
-    positionConfigurator(connector);
-    positionConfigurator(connector);
-
+    positionConnectorConfigurator(connector);
+    positionConnectorConfigurator(connector);
 
 }
 
 
 
 function addOutput(x, y, widget, connector, shouldAddConfigurator, type) {
+
+    var output = null;
+
     if (type == CIRCULAR_OUTPUT) {
-        addCircularOutput(x, y, widget, connector, shouldAddConfigurator);
+        output = addCircularOutput(x, y, widget, connector, shouldAddConfigurator);
     } else if (type == VERTICAL_RECTANGULAR_OUTPUT || type == HORIZONTAL_RECTANGULAR_OUTPUT || type == SQUARED_OUTPUT) {
-        addRectangularOutput(x, y, widget, connector, shouldAddConfigurator, type);
+        output = addRectangularOutput(x, y, widget, connector, shouldAddConfigurator, type);
     } else if (type == MINIATURE_OUTPUT) {
-        addMiniatureOutput(x, y, widget, connector, shouldAddConfigurator);
+        output = addMiniatureOutput(x, y, widget, connector, shouldAddConfigurator);
     } else if (type == TRIANGULAR_OUTPUT) {
-        addPolygonalOutput(x, y, widget, connector, shouldAddConfigurator, 3);
+        output = addPolygonalOutput(x, y, widget, connector, shouldAddConfigurator, 3);
     } else if (type == POLYGONAL_OUTPUT) {
-        addPolygonalOutput(x, y, widget, connector, shouldAddConfigurator, 5);
+        output = addPolygonalOutput(x, y, widget, connector, shouldAddConfigurator, 5);
     }
+
+}
+
+function addOutputDIV(output) {
+    
+    var outputDIV = $('<div/>');
+    outputDIV.css('background', '#FF0000');
+    outputDIV.css('opacity', '0');
+    outputDIV.css('color', '#fff');
+    outputDIV.css('width', output.getWidth() + 'px');
+    outputDIV.css('height', output.getHeight() + 'px');
+    document.body.appendChild(outputDIV[0]);
+
+    var outputShapes = {
+        'Circle': CIRCULAR_OUTPUT,
+        'Vertical Rect': VERTICAL_RECTANGULAR_OUTPUT,
+        'Horizontal Rect': HORIZONTAL_RECTANGULAR_OUTPUT,
+        'Square': SQUARED_OUTPUT,
+        'Triangle': TRIANGULAR_OUTPUT,
+        'Miniature': MINIATURE_OUTPUT,
+        'Polygon': POLYGONAL_OUTPUT
+    }
+
+    var outputShapeSelector = $('<select />');
+
+    for (var val in outputShapes) {
+        $('<option />', {value: val, text: outputShapes[val], selected: (val == output.type)}).appendTo(outputShapeSelector);
+    }
+
+    var configurationPanel = $('<div/>');
+
+    outputShapeSelector.on('change', function(e) {
+        
+        console.log("The output should change of shape");
+
+    });
+
+    configurationPanel.append($('<label/>', {text: "Output type: ", style: "margin-right: 5px;"}));
+    configurationPanel.append(outputShapeSelector);
+
+    outputDIV.tooltipster({
+        content: configurationPanel,
+        animation: 'grow',
+        trigger: 'click',
+//        autoClose: false,
+        interactive: true
+    });
+
+    output.configurator = outputDIV;
+    
+    positionOutputConfigurator(output);
+
 }
 
 function removeOutput(output, newType) {
-    
-    if (output == null) return;
-    
+
+    if (output == null)
+        return;
+
     var actionType = "REMOVING";
     if (newType != null) {
         actionType = "CHANGING";
     }
-    
+
     var minimunValue = 0;
     var duration = 280;
 
     if (output.type == CIRCULAR_OUTPUT) {
-        animateCircularOutput(output, minimunValue, duration, true, actionType, newType);
+        output.connectors.forEach(function(connector) {
+            animateCircularOutput(output, connector, minimunValue, duration, true, actionType, newType);
+        });
     } else if (output.type == VERTICAL_RECTANGULAR_OUTPUT || output.type == HORIZONTAL_RECTANGULAR_OUTPUT || output.type == SQUARED_OUTPUT) {
         var finalWidth = output.width;
         var finalHeight = output.height;
@@ -339,9 +432,14 @@ function removeOutput(output, newType) {
             finalWidth = minimunValue;
             finalHeight = finalWidth;
         }
-        animateRectangularOutput(output, finalWidth, finalHeight, duration, true, actionType, newType);
+        output.connectors.forEach(function(connector) {
+            animateRectangularOutput(output, connector, finalWidth, finalHeight, duration, true, actionType, newType);
+        });
     } else if (output.type == MINIATURE_OUTPUT || output.type == TRIANGULAR_OUTPUT || POLYGONAL_OUTPUT) {
-        animateMiniatureOutput(output, 0, 0, duration, true, actionType, newType);
+        output.connectors.forEach(function(connector) {
+            animateMiniatureOutput(output, connector, 0, 0, duration, true, actionType, newType);
+        });
+
     }
 
 }
@@ -369,25 +467,22 @@ function addRectangularOutput(x, y, widget, connector, shouldAddConfigurator, re
     var output = createRectangularOutput(x, y, initialWidth, initialHeight, widget.trueColor);
     output.type = rectangleType;
     output.widget = widget;
-    output.connector = connector;
+//    output.connector = connector;
     connector.output = output;
 
-    output.on({
-        'moving': function(option) {
-            outputMoving(option, output);
-        },
-        'modified': function(option) {
-            outputModified(option, output);
-        }
-    });
+    associateOutputEvents(output);
 
     canvas.add(output);
 
+    output.connectors.push(connector);
+
     if (shouldAddConfigurator) {
-        addConfigurator(output.connector);
+        addConfigurator(getLastElementOfArray(output.connectors));
     }
 
-    animateRectangularOutput(output, finalWidth, finalHeight, duration, false, "ADDING", null);
+    animateRectangularOutput(output, connector, finalWidth, finalHeight, duration, false, "ADDING", null);
+
+    return output;
 }
 
 function addPolygonalOutput(x, y, widget, connector, shouldAddConfigurator, nSides) {
@@ -418,25 +513,21 @@ function addPolygonalOutput(x, y, widget, connector, shouldAddConfigurator, nSid
 
     output.nSides = nSides;
     output.widget = widget;
-    output.connector = connector;
     connector.output = output;
 
-    output.on({
-        'moving': function(option) {
-            outputMoving(option, output);
-        },
-        'modified': function(option) {
-            outputModified(option, output);
-        }
-    });
+    associateOutputEvents(output);
 
     canvas.add(output);
 
+    output.connectors.push(connector);
+
     if (shouldAddConfigurator) {
-        addConfigurator(output.connector);
+        addConfigurator(getLastElementOfArray(output.connectors));
     }
 
-    animateMiniatureOutput(output, finalScaleX, finalScaleY, duration, false, "ADDING", null);
+    animateMiniatureOutput(output, connector, finalScaleX, finalScaleY, duration, false, "ADDING", null);
+
+    return output;
 
 }
 
@@ -463,7 +554,8 @@ function addMiniatureOutput(x, y, widget, connector, shouldAddConfigurator) {
             hasControls: false,
             hasBorders: false,
             hasRotatingPoint: false,
-            selectable: true
+            selectable: true,
+            connectors: new Array()
         });
     });
 
@@ -471,25 +563,22 @@ function addMiniatureOutput(x, y, widget, connector, shouldAddConfigurator) {
     output.scaleY = initialScaleY;
     output.type = MINIATURE_OUTPUT;
     output.widget = widget;
-    output.connector = connector;
+//    output.connector = connector;
     connector.output = output;
 
-    output.on({
-        'moving': function(option) {
-            outputMoving(option, output);
-        },
-        'modified': function(option) {
-            outputModified(option, output);
-        }
-    });
+    associateOutputEvents(output);
 
     canvas.add(output);
 
+    output.connectors.push(connector);
+
     if (shouldAddConfigurator) {
-        addConfigurator(output.connector);
+        addConfigurator(getLastElementOfArray(output.connectors));
     }
 
-    animateMiniatureOutput(output, finalScaleX, finalScaleY, duration, false, "ADDING", null);
+    animateMiniatureOutput(output, connector, finalScaleX, finalScaleY, duration, false, "ADDING", null);
+
+    return output;
 }
 
 
@@ -503,4 +592,34 @@ function deleteConnectors(output) {
 //        output.connectors.forEach(function(connector) {
 //            removeConnector(connector);
 //        });
+}
+
+function associateOutputEvents(output) {
+    output.on({
+        'moving': function(option) {
+            outputMoving(option, output);
+        },
+        'modified': function(option) {
+            outputModified(option, output);
+        },
+        'selected': function(option) {
+            outputSelected(option, output);
+        },
+        'mouseup': function(option) {
+            outputMouseUp(option, output);
+        }
+     
+    });
+}
+
+
+function addConnectorToOutput(output, connector) {
+
+    console.log(connector);
+
+    connector.output = output;
+//    connector.widget = output.widget;
+    output.connectors.push(connector);
+    canvas.add(output);
+    addConfigurator(connector);
 }

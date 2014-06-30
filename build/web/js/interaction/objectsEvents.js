@@ -39,6 +39,16 @@ function objectMoving(option, targetObject) {
         var currentX = targetObject.left;
         var currentY = targetObject.top;
         var arrayLength = targetObject.widgets.length;
+        
+        
+        console.log("arrayLength: " + arrayLength);
+
+
+
+//        targetObject.widgets.forEach(function(widget) {
+//
+//        });
+
 
 
         // Moving all the widgets associated to this object
@@ -55,7 +65,7 @@ function objectMoving(option, targetObject) {
 
             targetObject.widgets[i].connectors.forEach(function(connector) {
                 connector.set({x1: targetObject.widgets[i].left, y1: targetObject.widgets[i].top});
-                positionConfigurator(connector);
+                positionConnectorConfigurator(connector);
             });
 
 
@@ -241,6 +251,8 @@ function objectMouseup(option, targetObject) {
                                         widget.movingOpacity = 0.3;
 
                                         widget.connectors = new Array();
+
+                                        widget.isWidget = true;
 
 //                                    widget.borderColor = '#CC3333';
 //                                    widget.cornerColor = '#FFCC00';

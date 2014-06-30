@@ -14,10 +14,20 @@ function widgetSelected(option, targetWidget) {
         targetWidget.strokeWidth = widget_selected_stroke_width;
         targetWidget.strokeDashArray = widget_selected_stroke_dash_array;
 
+//        targetWidget.connectors.forEach(function(connector) {
+//            console.log(connector.configurator);
+//            connector.configurator.show();
+//        });
+
+
         if (lastSelectedWidget != null) {
             lastSelectedWidget.stroke = widget_stroke_color;
             lastSelectedWidget.strokeWidth = widget_stroke_width;
             lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
+
+//            lastSelectedWidget.connectors.forEach(function(connector) {
+//                connector.configurator.hide();
+//            });
         }
 
         lastSelectedWidget = targetWidget;
@@ -35,13 +45,13 @@ function widgetScaling(option, targetWidget) {
     console.log("widgetScaling");
 }
 function widgetMoving(option, targetWidget) {
-    
+
     console.log("widgetMoving");
     targetWidget.moving = true;
 
     var theEvent = option;
 //    if (fabric.isTouchSupported) {
-        theEvent = option['e'];
+    theEvent = option['e'];
 //    }        
 
     if (theEvent) {
@@ -50,12 +60,12 @@ function widgetMoving(option, targetWidget) {
         var coordX = theEvent.offsetX;
 
         if (fabric.isTouchSupported && theEvent.changedTouches && theEvent.changedTouches.length > 0) {
-                // Here I use the changedTouches list since the up event produces a change in it
-                coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
-                coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
-            }
+            // Here I use the changedTouches list since the up event produces a change in it
+            coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
+            coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
+        }
 
-        var connector = targetWidget.connectors[targetWidget.connectors.length - 1];        
+        var connector = targetWidget.connectors[targetWidget.connectors.length - 1];
         connector.set({x2: coordX, y2: coordY});
 //        canvas.add(connector);
 
@@ -67,13 +77,14 @@ function widgetMoving(option, targetWidget) {
 
 
 }
+
 function widgetMousedown(option, targetWidget) {
 
     console.log("widgetMousedown");
 
     var theEvent = option;
 //    if (fabric.isTouchSupported) {
-        theEvent = option['e'];
+    theEvent = option['e'];
 //    }
 
     if (theEvent) {
@@ -91,13 +102,13 @@ function widgetMousedown(option, targetWidget) {
         canvas.add(newConnector);
         newConnector.widget = targetWidget;
         targetWidget.connectors.push(newConnector);
-        
+
     }
 
 }
 
 function widgetMouseup(option, targetWidget) {
-    
+
     console.log("widgetMouseup");
     if (targetWidget.permanentOpacity) {
         targetWidget.opacity = targetWidget.permanentOpacity;
@@ -109,7 +120,7 @@ function widgetMouseup(option, targetWidget) {
 
         var theEvent = option;
 //        if (fabric.isTouchSupported) {
-            theEvent = option['e'];
+        theEvent = option['e'];
 //        }
 
         if (theEvent) {
@@ -123,19 +134,43 @@ function widgetMouseup(option, targetWidget) {
                 coordX = theEvent.changedTouches[0].pageX - $('#theCanvas').offset().left;
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
-            
-//            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
+
+
+            var existingOutput = getOutputContaining(coordX, coordY);
+
+            // The mouse up event is done over a blank section of the canvas
+            if (existingOutput == null) {
+
+                //            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
 //            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
 
 
-            
-            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, CIRCULAR_OUTPUT);
+
+//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, CIRCULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
+                addOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, TRIANGULAR_OUTPUT);
 //            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, MINIATURE_OUTPUT);
+
+
+
+
+
+            } else {
+                // if the mouse up event happens over an existing output
+                
+                var connector = getLastElementOfArray(targetWidget.connectors);
+                addConnectorToOutput (existingOutput, connector);
+
+
+            }
+
+
+
+
 
         }
 
@@ -296,6 +331,22 @@ function animateWidget(widget, top, left, duration) {
 }
 
 
-function applyWidgetStyle(widget) {
+function removeWidget(widget) {
+    widget.connectors.forEach(function(connector) {
+        removeOutput(connector.output);
+    });
+    canvas.remove(widget);
+}
 
+
+
+function getOutputContaining(x, y) {
+    var theObject = null;
+    canvas.forEachObject(function(object) {
+        var point = new fabric.Point(x, y);
+        if (object.isOutput && object.containsPoint(point)) {
+            theObject = object;
+        }
+    });
+    return theObject;
 }

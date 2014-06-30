@@ -322,8 +322,6 @@
 
                     imgInstance.id = df;
 
-                    console.log(df);
-
                     var request = new XMLHttpRequest();
                     request.open("POST", "UploadFile", false);
                     var boundary = Math.random().toString().substr(2);
@@ -339,6 +337,8 @@
                             if (request.status == 200) { // is everything OK?
                                 var textResponse = request.responseText; // getting the result
                                 var objects = JSON.parse(textResponse);
+
+                                console.log(objects);
 
                                 for (var i in objects) {
 
@@ -359,6 +359,8 @@
                                     rect.hasRotatingPoint = false;
 
                                     imgInstance.widgets.push(rect);
+
+                                    console.log(imgInstance.widgets);
 
                                     canvas.add(rect);
                                 }
@@ -407,6 +409,10 @@
 
             // create a wrapper around native canvas element (with id="theCanvas")
             var canvas = new fabric.Canvas('theCanvas', {backgroundColor: "#ffffff"});
+
+
+
+
 
 //            canvas.on("touch:drag", function(option) {
 //                console.log(option);
@@ -701,17 +707,32 @@
                     alertify.confirm("Are you sure you want to remove the selected object?", function(e) {
                         if (e) {
                             var obj = canvas.getActiveObject();
-                            canvas.remove(obj);
-                            if (obj.parentObject) {
-                                var index = obj.parentObject.widgets.indexOf(obj);
-                                if (index > -1) {
-                                    obj.parentObject.widgets.splice(index, 1);
-                                    obj.parentObject = null;
-                                }
+
+
+                            // If we are removing a widget, we should also remove the connectors associated to it
+                            if (obj.isWidget) {
+                                removeWidget(obj);
+                            } else if (obj.isOutput) {
+                                removeOutput(obj, null);
+                            } else if (obj.isConnector) {
+                                removeConnector(obj);
                             }
 
 
+
+//                            canvas.remove(obj);
+//                            if (obj.parentObject) {
+//                                var index = obj.parentObject.widgets.indexOf(obj);
+//                                if (index > -1) {
+//                                    obj.parentObject.widgets.splice(index, 1);
+//                                    obj.parentObject = null;
+//                                }
+//                            }
+
+
+                            canvas.renderAll();
                             alertify.log("Object removed", "", 3000);
+
                         }
                     });
                 } else {
