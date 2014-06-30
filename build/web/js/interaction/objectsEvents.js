@@ -7,10 +7,12 @@ function objectRemoved(option, targetObject) {
 function objectSelected(option, targetObject) {
     console.log("objectSelected");
     if (lastSelectedWidget != null) {
-        lastSelectedWidget.stroke = widget_stroke_color;
-        lastSelectedWidget.strokeWidth = widget_stroke_width;
-        lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
+        widgetApplyUnselectedStyle(lastSelectedWidget);
         lastSelectedWidget = null;
+    }
+    if (lastSelectedOutput != null) {
+        outputApplyUnselectedStyle(lastSelectedOutput);
+        lastSelectedOutput = null;
     }
 }
 function objectModified(option, targetObject) {
@@ -24,7 +26,7 @@ function objectRotating(option, targetObject) {
 function objectScaling(option, targetObject) {
     console.log("objectScaling");
 }
-function objectMoving(option, targetObject) {
+function objectMoving(option, targetObject, parentGroup) {
 
     console.log("objectMoving");
     targetObject.moving = true;
@@ -36,43 +38,48 @@ function objectMoving(option, targetObject) {
     }
 
     if (targetObject.type == "importedImage") {
+
         var currentX = targetObject.left;
         var currentY = targetObject.top;
-        var arrayLength = targetObject.widgets.length;
-        
-        
-        console.log("arrayLength: " + arrayLength);
 
-
-
-//        targetObject.widgets.forEach(function(widget) {
-//
-//        });
-
-
+        if (parentGroup) {
+            currentX = parentGroup.left;
+            currentY = parentGroup.top;
+        }
 
         // Moving all the widgets associated to this object
-        for (var i = 0; i < arrayLength; i++) {
-            targetObject.widgets[i].left = targetObject.widgets[i].left + (currentX - previousX);
-            targetObject.widgets[i].top = targetObject.widgets[i].top + (currentY - previousY);
-            if (targetObject.widgets[i].movingOpacity) {
-                targetObject.widgets[i].opacity = targetObject.widgets[i].movingOpacity;
-            } else {
-                targetObject.widgets[i].opacity = 0.6;
-            }
-            targetObject.widgets[i].setCoords();
-            // modifying all the connectors' source points that are linked to this widget
+        targetObject.widgets.forEach(function(widget) {
 
-            targetObject.widgets[i].connectors.forEach(function(connector) {
-                connector.set({x1: targetObject.widgets[i].left, y1: targetObject.widgets[i].top});
+            widget.left = widget.left + (currentX - previousX);
+            widget.top = widget.top + (currentY - previousY);
+
+            if (widget.movingOpacity) {
+                widget.opacity = widget.movingOpacity;
+            } else {
+                widget.opacity = 0.6;
+            }
+            widget.setCoords();
+
+            widget.connectors.forEach(function(connector) {
+                connector.set({x1: widget.left, y1: widget.top});
                 positionConnectorConfigurator(connector);
             });
 
+            canvas.bringToFront(widget);
 
+        });
+
+        if (parentGroup) {
+            previousAngle = parentGroup.angle;
+            previousX = parentGroup.left;
+            previousY = parentGroup.top;
+        } else {
+            previousAngle = targetObject.angle;
+            previousX = targetObject.left;
+            previousY = targetObject.top;
         }
-        previousAngle = targetObject.angle;
-        previousX = targetObject.left;
-        previousY = targetObject.top;
+
+
 
     } else if (targetObject.type.indexOf("slider") > -1) {
         var relPos = computeRelativeLocation(targetObject.parentObject, targetObject, targetObject.left, targetObject.top);
@@ -103,14 +110,25 @@ function objectMouseup(option, targetObject) {
         targetObject.opacity = 1;
     }
 
-    var arrayLength = targetObject.widgets.length;
-    for (var i = 0; i < arrayLength; i++) {
-        if (targetObject.widgets[i].permanentOpacity) {
-            targetObject.widgets[i].opacity = targetObject.widgets[i].permanentOpacity;
+    // Moving all the widgets associated to this object
+    targetObject.widgets.forEach(function(widget) {
+
+        if (widget.permanentOpacity) {
+            widget.opacity = widget.permanentOpacity;
         } else {
-            targetObject.widgets[i].opacity = 1;
+            widget.opacity = 1;
         }
-    }
+
+    });
+
+//    var arrayLength = targetObject.widgets.length;
+//    for (var i = 0; i < arrayLength; i++) {
+//        if (targetObject.widgets[i].permanentOpacity) {
+//            targetObject.widgets[i].opacity = targetObject.widgets[i].permanentOpacity;
+//        } else {
+//            targetObject.widgets[i].opacity = 1;
+//        }
+//    }
 
     if (!targetObject.moving) {
 
@@ -120,10 +138,10 @@ function objectMouseup(option, targetObject) {
 //    console.log(option);
 
         var theEvent = option;
-        if (fabric.isTouchSupported) {
-            theEvent = option['e'];
+//        if (fabric.isTouchSupported) {
+        theEvent = option['e'];
 //        console.log("Touch Supported");
-        }
+//        }
 
 //    console.log("theEvent:");
 //    console.log(theEvent);
@@ -132,7 +150,12 @@ function objectMouseup(option, targetObject) {
 
         if (targetObject.type == "importedImage") {
 
+            targetObject.lockMovementX = true;
+            targetObject.lockMovementY = true;
+
             if (theEvent) {
+
+
 
                 // coordX and coordY are the points of the clic relative to the canvas
 //            var coordY = theEvent.offsetY;
@@ -254,6 +277,8 @@ function objectMouseup(option, targetObject) {
 
                                         widget.isWidget = true;
 
+                                        widget.parentObject = targetObject;
+
 //                                    widget.borderColor = '#CC3333';
 //                                    widget.cornerColor = '#FFCC00';
 //                                    widget.transparentCorners = false;
@@ -291,6 +316,9 @@ function objectMouseup(option, targetObject) {
                     }
                 };
                 request.send("x=" + relativeX + "&y=" + relativeY + "&imageId=" + targetObject.id); // sending the data to the server
+            } else {
+                targetObject.lockMovementX = false;
+                targetObject.lockMovementY = false;
             }
         }
 

@@ -1,9 +1,11 @@
+var lastSelectedOutput = null;
+
 var lastTime;
 
 function outputMouseUp(option, output) {
     var date = new Date();
     var now = date.getTime();
-    if(now - lastTime < 500){
+    if (now - lastTime < 500) {
         outputDoubleClicked(option, output);
     }
     lastTime = now;
@@ -13,26 +15,77 @@ function outputDoubleClicked(option, output) {
     output.configurator.tooltipster('show');
 }
 
-function outputSelected(option, output) {
-    output.connectors.forEach(function(connector) {
-        canvas.setActiveObject(connector.widget);
-    });
+function outputApplySelectedStyle(output) {
+    if (output != null) {
+        output.stroke = widget_selected_stroke_color;
+        output.strokeWidth = widget_selected_stroke_width;
+        output.strokeDashArray = widget_selected_stroke_dash_array;
+        output.connectors.forEach(function(connector) {
+            widgetApplySelectedStyle(connector.widget);
+        });
+    }
 }
 
-function outputMoving(option, output) {
+function outputApplyUnselectedStyle(output) {
+    if (output != null) {
+        output.stroke = '';
+        output.strokeWidth = 1;
+        output.strokeDashArray = [];
+        output.connectors.forEach(function(connector) {
+            widgetApplyUnselectedStyle(connector.widget);
+        });
+    }
+}
+
+function outputSelected(option, output) {
+
+    console.log("outputSelected");
+
+    widgetApplyUnselectedStyle(lastSelectedWidget);
+    outputApplyUnselectedStyle(lastSelectedOutput);
+    outputApplySelectedStyle(output);
+
+    lastSelectedOutput = output;
+    lastSelectedWidget = null;
+    canvas.renderAll();
+}
+
+function outputMoving(option, output, parentGroup) {
     console.log("outputMoving");
     output.connectors.forEach(function(connector) {
-        connector.set({x2: output.left, y2: output.top});
+        if (parentGroup) {
+            connector.set({x2: parentGroup.left + output.left, y2: parentGroup.top + output.top});
+        } else {
+            connector.set({x2: output.left, y2: output.top});
+        }
         positionConnectorConfigurator(connector);
         positionOutputConfigurator(output);
     });
     canvas.renderAll();
 }
 
-function outputModified(option, output) {
+function outputScaling(option, output, parentGroup) {
+    console.log("outputMoving");
+    output.connectors.forEach(function(connector) {
+        if (parentGroup) {
+            connector.set({x2: parentGroup.left + output.left, y2: parentGroup.top + output.top});
+        } else {
+            connector.set({x2: output.left, y2: output.top});
+        }
+        positionConnectorConfigurator(connector);
+        positionOutputConfigurator(output);
+    });
+    canvas.renderAll();
+}
+
+function outputModified(option, output, parentGroup) {
     console.log("outputModified");
     output.connectors.forEach(function(connector) {
-        connector.set({x2: output.left, y2: output.top});
+        if (parentGroup) {
+            connector.set({x2: parentGroup.left + output.left, y2: parentGroup.top + output.top});
+        } else {
+            connector.set({x2: output.left, y2: output.top});
+        }
         positionConnectorConfigurator(connector);
         positionOutputConfigurator(output);
     });
@@ -254,19 +307,19 @@ function positionConnectorConfigurator(connector) {
 
     configurator.css('top', (connector.getCenterPoint().y + $('#theCanvas').offset().top - height / 2 - 2.5) + 'px');
     configurator.css('left', (connector.getCenterPoint().x + $('#theCanvas').offset().left - width / 2 - 2.5) + 'px');
-    
+
     configurator.tooltipster('reposition');
 
-} 
+}
 
-function positionOutputConfigurator (output) {
-    var outputDIV = output.configurator; 
+function positionOutputConfigurator(output) {
+    var outputDIV = output.configurator;
     outputDIV.css('position', 'absolute');
     outputDIV.css('top', (output.getCenterPoint().y + $('#theCanvas').offset().top - output.getHeight() / 2) + 'px');
     outputDIV.css('left', (output.getCenterPoint().x + $('#theCanvas').offset().left - output.getWidth() / 2) + 'px');
     outputDIV.css('z-index', '-1');
     outputDIV.tooltipster('reposition');
-    
+
 }
 
 function addConfigurator(connector) {
@@ -352,7 +405,7 @@ function addOutput(x, y, widget, connector, shouldAddConfigurator, type) {
 }
 
 function addOutputDIV(output) {
-    
+
     var outputDIV = $('<div/>');
     outputDIV.css('background', '#FF0000');
     outputDIV.css('opacity', '0');
@@ -380,7 +433,7 @@ function addOutputDIV(output) {
     var configurationPanel = $('<div/>');
 
     outputShapeSelector.on('change', function(e) {
-        
+
         console.log("The output should change of shape");
 
     });
@@ -397,7 +450,7 @@ function addOutputDIV(output) {
     });
 
     output.configurator = outputDIV;
-    
+
     positionOutputConfigurator(output);
 
 }
@@ -555,7 +608,8 @@ function addMiniatureOutput(x, y, widget, connector, shouldAddConfigurator) {
             hasBorders: false,
             hasRotatingPoint: false,
             selectable: true,
-            connectors: new Array()
+            connectors: new Array(),
+            isOutput: true
         });
     });
 
@@ -607,19 +661,71 @@ function associateOutputEvents(output) {
         },
         'mouseup': function(option) {
             outputMouseUp(option, output);
+        },
+        'scaling': function(option) {
+            outputScaling(option, output);
         }
-     
+
     });
 }
 
 
 function addConnectorToOutput(output, connector) {
-
-    console.log(connector);
-
+    canvas.bringToFront(output);
     connector.output = output;
-//    connector.widget = output.widget;
     output.connectors.push(connector);
-    canvas.add(output);
+    outputBlink(output);
     addConfigurator(connector);
+}
+
+function outputBlink(output) {
+
+    var currentStroke = output.stroke;
+    var currentStrokeWidth = output.strokeWidth;
+//    var currentStrokeDashArray = output.strokeDashArray;
+
+    var increment = 0.2;
+    var angleIncrement = 10;
+    var property1 = 'scaleX';
+    var property2 = 'scaleY';
+    var value1 = output.get(property1) + increment;
+    var value2 = output.get(property2) + increment;
+    var duration = 100;
+
+    var easing = fabric.util.ease['easeInCubic'];
+
+    output.stroke = widget_selected_stroke_color;
+    output.strokeWidth = widget_selected_stroke_width;
+//    output.strokeDashArray = widget_selected_stroke_dash_array;
+
+    output.animate(property1, value1, {
+        duration: duration,
+        onChange: canvas.renderAll.bind(canvas),
+        easing: easing,
+        onComplete: function() {
+            output.animate(property1, value1 - increment, {
+                duration: 1100,
+                onChange: canvas.renderAll.bind(canvas),
+                easing: fabric.util.ease['easeOutElastic']
+            });
+        }
+    });
+    output.animate(property2, value2, {
+        duration: duration,
+        onChange: canvas.renderAll.bind(canvas),
+        easing: easing,
+        onComplete: function() {
+            output.animate(property2, value2 - increment, {
+                duration: 1100,
+                onChange: canvas.renderAll.bind(canvas),
+                easing: fabric.util.ease['easeOutElastic'],
+            });
+        }
+    });
+    setTimeout(function() {
+        output.stroke = currentStroke;
+        output.strokeWidth = currentStrokeWidth;
+//        output.strokeDashArray = currentStrokeDashArray;
+        canvas.renderAll();
+    }, 800);
 }

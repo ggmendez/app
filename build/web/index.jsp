@@ -243,11 +243,16 @@
 
 
 
+
+
         <script>
 
             $(document).ready(function() {
                 $('.tooltip').tooltipster();
             });
+
+
+
 
 
             // global variables
@@ -289,6 +294,8 @@
                     imgInstance.centeredRotation = true;
 
                     imgInstance.type = "importedImage";
+                    imgInstance.isImage = true;
+                    
                     imgInstance.downTouchs = 0;
                     imgInstance.widgets = new Array();
 

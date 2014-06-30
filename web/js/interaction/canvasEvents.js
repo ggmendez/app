@@ -1,22 +1,29 @@
-function canvasSelectionCleared(option) {
-    console.log("canvasSelectionCleared");
-    var activeObject = option.target;
-    if (activeObject.type == "widget") {
-        widget = activeObject;
-        widget.stroke = 'red';
-        widget.strokeWidth = 10;
-        widget.strokeDashArray = [5, 5];
-    }
-}
-
-function canvasSelectionCreated(option) {
-    console.log("canvasSelectionCreated");
-    
-}
+//function canvasSelectionCleared(option) {
+//    console.log("canvasSelectionCleared");
+//    var activeObject = option.target;
+//    if (activeObject.type == "widget") {
+//        widget = activeObject;
+//        widget.stroke = 'red';
+//        widget.strokeWidth = 10;
+//        widget.strokeDashArray = [5, 5];
+//    }
+//}
 
 function canvasObjectModified(option) {
 
-//    console.log("canvasObjectModified");
+    console.log("canvasObjectModified");
+
+    if (option.target._objects) {
+        option.target._objects.forEach(function(object) {
+
+            if (object.isOutput) {
+                outputModified(option, object, option.target);
+            } else if (object.isWidget) {
+                widgetModified(option, object, option.target);
+            }
+
+        });
+    }
 
 
 }
@@ -53,6 +60,19 @@ function canvasObjectRotating(option) {
 function canvasObjectScaling(option) {
 
     console.log("canvasObjectScaling");
+
+
+    if (option.target._objects) {
+        option.target._objects.forEach(function(object) {
+
+            if (object.isOutput) {
+                outputScaling(option, object, option.target);
+            } else if (object.isWidget) {
+                widgetSacaling(option, object, option.target);
+            }
+
+        });
+    }
 
     if (option.target.type == "importedImage") {
         var obj = option.target;
@@ -126,43 +146,44 @@ function canvasObjectScaling(option) {
 
 function canvasObjectMoving(option) {
 
-//    console.log("canvasObjectMoving");
+    console.log("canvasObjectMoving");
 
-//    var targetObject = option.target;
-//
-//    if (obj.movingOpacity) {
-//        obj.opacity = obj.movingOpacity;
-//    } else {
-//        obj.opacity = 0.65;
-//    }
+    if (option.target._objects) {
 
-    
+        option.target._objects.forEach(function(object) {
 
+            object.lockMovementX = false;
+            object.lockMovementY = false;
 
-    // TODO: When a widget is moved and dropped out of its parent,
-    // this object should be removed from its parent's widgets list
-//                            if (e.target.parentObject) {
-//                                var index = e.target.parentObject.widgets.indexOf(e.target);
-//                                if (index > -1) {
-//                                    e.target.parentObject.widgets.splice(index, 1);
-//                                    e.target.parentObject = null;
-//                                }
-//                            }
+            if (object.isOutput) {
+                outputMoving(option, object, option.target);
+            } else if (object.isWidget) {
+//                widgetMoving(option, object, option.target);
+            } else if (object.isImage) {
+                objectMoving(option, object, option.target);
+            }
+
+        });
+    }
 
 }
 
 function canvasObjectSelected(option) {
     console.log("canvasObjectSelected");
     var activeObject = option.target;
-    if (activeObject.type == "importedImage") {
+
+    previousX = activeObject.left;
+    previousY = activeObject.top;
+    previousAngle = activeObject.angle;
+
+    if (activeObject.isImage) {
         previousX = option.target.left;
         previousY = option.target.top;
         previousAngle = option.target.angle;
-    } else if (activeObject.type == "widget") {
-        widget = activeObject;
-        widget.stroke = widget_selected_stroke_color;
-        widget.strokeWidth = widget_selected_stroke_width;
-        widget.strokeDashArray = widget_selected_stroke_dash_array;
+    } else if (activeObject.isWidget) {
+        widgetApplySelectedStyle(activeObject);
+    } else if (activeObject.isOutput) {
+        outputApplySelectedStyle(activeObject);
     }
     canvas.renderAll();
 }
@@ -170,16 +191,34 @@ function canvasObjectSelected(option) {
 function canvasSelectionCleared(option) {
     console.log("canvasSelectionCleared");
     if (lastSelectedWidget != null) {
-        lastSelectedWidget.stroke = widget_stroke_color;
-        lastSelectedWidget.strokeWidth = widget_stroke_width;
-        lastSelectedWidget.strokeDashArray = widget_stroke_dash_array;
+        widgetApplyUnselectedStyle(lastSelectedWidget);
         lastSelectedWidget = null;
     }
+    if (lastSelectedOutput != null) {
+        outputApplyUnselectedStyle(lastSelectedOutput);
+        lastSelectedOutput = null;
+    }
+
+    canvas.getObjects().forEach(function(object) {
+        if (object.permanentOpacity) {
+            object.opacity = object.permanentOpacity;
+        } else {
+            object.opacity = 1;
+        }
+    });
+
+
+
     canvas.renderAll();
 }
 
 function canvasSelectionCreated(option) {
     console.log("canvasSelectionCreated");
+
+    previousX = option.target.left;
+    previousY = option.target.top;
+    previousAngle = option.target.angle;
+
 }
 
 function canvasPathCreated(option) {
@@ -209,6 +248,9 @@ function canvasMouseUp(option) {
 //    } else {
 //        obj.opacity = 1;
 //    }
+
+
+
 
 }
 
