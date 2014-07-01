@@ -251,6 +251,11 @@
                 $('.tooltip').tooltipster();
             });
 
+            
+//            $.fn.tooltipster('setDefaults', {                
+//                delay: 0
+//            });
+
 
 
 
@@ -295,7 +300,7 @@
 
                     imgInstance.type = "importedImage";
                     imgInstance.isImage = true;
-                    
+
                     imgInstance.downTouchs = 0;
                     imgInstance.widgets = new Array();
 
@@ -418,9 +423,6 @@
             var canvas = new fabric.Canvas('theCanvas', {backgroundColor: "#ffffff"});
 
 
-
-
-
 //            canvas.on("touch:drag", function(option) {
 //                console.log(option);
 //            });
@@ -441,9 +443,9 @@
                 'mouse:up': function(option) {
                     canvasMouseUp(option);
                 },
-                'object:moving': function(option) {
-                    canvasObjectMoving(option);
-                },
+//                'object:moving': function(option) {
+//                    canvasObjectMoving(option);
+//                },
                 'object:modified': function(option) {
                     canvasObjectModified(option);
                 },

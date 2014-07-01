@@ -81,8 +81,9 @@ function widgetMoving(option, targetWidget, parentGroup) {
             coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
         }
 
-        var connector = targetWidget.connectors[targetWidget.connectors.length - 1];
-        connector.set({x2: coordX, y2: coordY});
+        var lastAddedConnector = getLastElementOfArray(targetWidget.connectors);
+
+        lastAddedConnector.set({x2: coordX, y2: coordY});
 
         canvas.renderAll();
 
@@ -133,13 +134,9 @@ function widgetMouseup(option, targetWidget) {
 
     if (targetWidget.moving) {
 
-        var theEvent = option;
-//        if (fabric.isTouchSupported) {
-        theEvent = option['e'];
-//        }
+        var theEvent = option['e'];
 
         if (theEvent) {
-
 
             var coordY = theEvent.offsetY;
             var coordX = theEvent.offsetX;
@@ -150,46 +147,37 @@ function widgetMouseup(option, targetWidget) {
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
 
-
             var existingOutput = getOutputContaining(coordX, coordY);
 
             // The mouse up event is done over a blank section of the canvas
             if (existingOutput == null) {
 
-                //            addCircularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true);
-//            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
-//            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
-//            addRectangularOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
+//                console.log(targetWidget.connectors);
 
+                var lastAddedConnector = getLastElementOfArray(targetWidget.connectors);
 
+//                console.log(lastAddedConnector);
 
-//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, CIRCULAR_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, VERTICAL_RECTANGULAR_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, HORIZONTAL_RECTANGULAR_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, SQUARED_OUTPUT);
-                addOutput(coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, TRIANGULAR_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, targetWidget.connectors[targetWidget.connectors.length - 1], true, MINIATURE_OUTPUT);
+                var arrayOfConnectors = new Array(lastAddedConnector);
 
+                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, CIRCULAR_OUTPUT);
+//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, VERTICAL_RECTANGULAR_OUTPUT);
+//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, HORIZONTAL_RECTANGULAR_OUTPUT);
 
-
-
+//                addOutput(coordX, coordY, targetWidget, arrayOfConnectors, true, CIRCULAR_OUTPUT, ADDING_NEW_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, VERTICAL_RECTANGULAR_OUTPUT, ADDING_NEW_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, HORIZONTAL_RECTANGULAR_OUTPUT, ADDING_NEW_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, SQUARED_OUTPUT, ADDING_NEW_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, TRIANGULAR_OUTPUT, ADDING_NEW_OUTPUT);
+//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, MINIATURE_OUTPUT, ADDING_NEW_OUTPUT);
 
             } else {
                 // if the mouse up event happens over an existing output
-
                 var connector = getLastElementOfArray(targetWidget.connectors);
                 addConnectorToOutput(existingOutput, connector);
-
-
             }
 
-
-
-
-
         }
-
-
 
     } else {
         // removing the last connector added when the widget was down clicked 
@@ -205,6 +193,8 @@ function widgetMouseup(option, targetWidget) {
 }
 
 function animateWidget(widget, top, left, duration) {
+
+    
 
 //    var easing = fabric.util.ease.easeOutExpo;
 
@@ -236,9 +226,9 @@ function animateWidget(widget, top, left, duration) {
         duration: duration,
         easing: easing,
         onComplete: function() {
-            widget.parentObject.lockMovementX = false;
-            widget.parentObject.lockMovementY = false;
+            widgetAssociateMouseEvents(widget);
             canvas.bringToFront(widget);
+            canvas.setActiveObject(widget);
         }
     });
 }

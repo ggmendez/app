@@ -29,6 +29,7 @@ function objectScaling(option, targetObject) {
 function objectMoving(option, targetObject, parentGroup) {
 
     console.log("objectMoving");
+
     targetObject.moving = true;
 
     if (targetObject.movingOpacity) {
@@ -42,10 +43,10 @@ function objectMoving(option, targetObject, parentGroup) {
         var currentX = targetObject.left;
         var currentY = targetObject.top;
 
-        if (parentGroup) {
-            currentX = parentGroup.left;
-            currentY = parentGroup.top;
-        }
+//        if (parentGroup) {
+//            currentX = parentGroup.left;
+//            currentY = parentGroup.top;
+//        }
 
         // Moving all the widgets associated to this object
         targetObject.widgets.forEach(function(widget) {
@@ -69,15 +70,15 @@ function objectMoving(option, targetObject, parentGroup) {
 
         });
 
-        if (parentGroup) {
-            previousAngle = parentGroup.angle;
-            previousX = parentGroup.left;
-            previousY = parentGroup.top;
-        } else {
-            previousAngle = targetObject.angle;
-            previousX = targetObject.left;
-            previousY = targetObject.top;
-        }
+//        if (parentGroup) {
+//            previousAngle = parentGroup.angle;
+//            previousX = parentGroup.left;
+//            previousY = parentGroup.top;
+//        } else {
+        previousAngle = targetObject.angle;
+        previousX = targetObject.left;
+        previousY = targetObject.top;
+//        }
 
 
 
@@ -100,7 +101,7 @@ function objectMousedown(option, targetObject) {
 
 
 
-function objectMouseup(option, targetObject) {
+function objectMouseup(option, targetObject) {        
 
     console.log("objectMouseup");
 
@@ -137,21 +138,14 @@ function objectMouseup(option, targetObject) {
 //    console.log("option:");
 //    console.log(option);
 
-        var theEvent = option;
-//        if (fabric.isTouchSupported) {
-        theEvent = option['e'];
-//        console.log("Touch Supported");
-//        }
+        var theEvent = option['e'];
 
-//    console.log("theEvent:");
-//    console.log(theEvent);
 
 
 
         if (targetObject.type == "importedImage") {
 
-            targetObject.lockMovementX = true;
-            targetObject.lockMovementY = true;
+            
 
             if (theEvent) {
 
@@ -183,7 +177,7 @@ function objectMouseup(option, targetObject) {
 //            var relativeX = localPoint.x;
 //            var relativeY = localPoint.y;
 
-                var localPointer = targetObject.getLocalPointer(option['e']);
+                var localPointer = targetObject.getLocalPointer(theEvent);
 //                console.log("localPointer");
 //                console.log(localPointer);
 
@@ -283,22 +277,10 @@ function objectMouseup(option, targetObject) {
 //                                    widget.cornerColor = '#FFCC00';
 //                                    widget.transparentCorners = false;
 
+                                        targetObject.widgets.push(widget);
 
 
-                                        widget.on({
-                                            'mouseup': function(option) {
-                                                widgetMouseup(option, widget);
-                                            },
-                                            'mousedown': function(option) {
-                                                widgetMousedown(option, widget);
-                                            },
-                                            'moving': function(option) {
-                                                widgetMoving(option, widget);
-                                            },
-                                            'selected': function(option) {
-                                                widgetSelected(option, widget);
-                                            }
-                                        });
+
 
                                         canvas.add(widget);
                                         canvas.bringToFront(widget);
@@ -306,7 +288,7 @@ function objectMouseup(option, targetObject) {
 
                                         animateWidget(widget, finalY, finalX, 500, true);
 
-                                        targetObject.widgets.push(widget);
+
 
 
                                     }
@@ -316,9 +298,6 @@ function objectMouseup(option, targetObject) {
                     }
                 };
                 request.send("x=" + relativeX + "&y=" + relativeY + "&imageId=" + targetObject.id); // sending the data to the server
-            } else {
-                targetObject.lockMovementX = false;
-                targetObject.lockMovementY = false;
             }
         }
 
@@ -329,4 +308,22 @@ function objectMouseup(option, targetObject) {
     targetObject.downTouchs--;
     targetObject.moving = false;
     canvas.renderAll();
+}
+
+
+function widgetAssociateMouseEvents(widget) {
+    widget.on({
+        'mouseup': function(option) {
+            widgetMouseup(option, widget);
+        },
+        'mousedown': function(option) {
+            widgetMousedown(option, widget);
+        },
+        'moving': function(option) {
+            widgetMoving(option, widget);
+        },
+        'selected': function(option) {
+            widgetSelected(option, widget);
+        }
+    });
 }

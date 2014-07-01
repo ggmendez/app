@@ -145,8 +145,12 @@ function canvasObjectScaling(option) {
 }
 
 function canvasObjectMoving(option) {
+    
+    
 
     console.log("canvasObjectMoving");
+    
+    console.log(option);
 
     if (option.target._objects) {
 
