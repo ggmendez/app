@@ -160,7 +160,8 @@ function widgetMouseup(option, targetWidget) {
 
                 var arrayOfConnectors = new Array(lastAddedConnector);
 
-                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, CIRCULAR_OUTPUT);
+//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, CIRCULAR_OUTPUT);
+                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, TRIANGULAR_OUTPUT);
 //                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, VERTICAL_RECTANGULAR_OUTPUT);
 //                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, HORIZONTAL_RECTANGULAR_OUTPUT);
 

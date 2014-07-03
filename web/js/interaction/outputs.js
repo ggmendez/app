@@ -154,19 +154,19 @@ function createPolygonalOutput(x, y, points, color) {
 
 function createGenericOutput(x, y, widget, outputType, options) {
 
-    var constructor = null;
+    var output = null;
 
     if (outputType == HORIZONTAL_RECTANGULAR_OUTPUT || outputType == VERTICAL_RECTANGULAR_OUTPUT || outputType == SQUARED_OUTPUT) {
-        constructor = fabric.Rect;
+        output = new fabric.Rect();
     } else if (outputType == CIRCULAR_OUTPUT) {
-        constructor = fabric.Circle;
+        output = new fabric.Circle();
     } else if (outputType == TRIANGULAR_OUTPUT || outputType == POLYGONAL_OUTPUT) {
-        constructor = fabric.Polygon;
+        output = new fabric.Polygon(options != null ? options['points'] ? options['points'] : [] : []);
     } else if (outputType == MINIATURE_OUTPUT) {
         // TODO: special thin, basically, clone the parent of the widget sent to this function
     }
 
-    var output = new constructor({
+    output.set({
         originX: 'center',
         originY: 'center',
         left: x,
@@ -180,14 +180,19 @@ function createGenericOutput(x, y, widget, outputType, options) {
         isOutput: true,
         selectable: true,
         connectors: new Array(),
-        // TODO: REMOVE THIS TOMORROW
-        widget: widget
     });
 
     if (options != null) {
         for (var key in options) {
             output.set(key, options[key]);
         }
+    }
+
+    if (outputType == TRIANGULAR_OUTPUT || outputType == POLYGONAL_OUTPUT || outputType == MINIATURE_OUTPUT) {
+        output.set({
+            scaleX: 0,
+            scaleY: 0
+        });
     }
 
     associateOutputEvents(output);
@@ -457,6 +462,8 @@ function addOutputAt(x, y, widget, connector, outputType) {
 
     var options = generateInitialOptions(outputType, widget);
 
+    console.log(options);
+
     var output = createGenericOutput(x, y, widget, outputType, options);
 
     output.type = outputType;
@@ -485,13 +492,28 @@ function addOutputAt(x, y, widget, connector, outputType) {
 // This function replaces an existing output with another of a different shape
 function changeOutputShape(oldOutput, newType) {
 
-    var newOutput = createGenericOutput(oldOutput.left, oldOutput.top, null, newType, null);
+    var nSides = 5;
+
+    if (newType == TRIANGULAR_OUTPUT) {
+        nSides = 3;
+    }
+
+    var finalOptions = generateNewOptions(oldOutput, newType);
+
+    var polygonalInitialOptions = generateInitialPolygonalOptions(finalOptions['radius'], nSides);
+
+    var newOutput = null;
+    if (newType == TRIANGULAR_OUTPUT || newType == POLYGONAL_OUTPUT) {
+        newOutput = createGenericOutput(oldOutput.left, oldOutput.top, null, newType, polygonalInitialOptions);
+    } else {
+        newOutput = createGenericOutput(oldOutput.left, oldOutput.top, null, newType, null);
+    }
+
     newOutput.fill = oldOutput.fill;
     newOutput.stroke = oldOutput.stroke;
     newOutput.strokeWidth = oldOutput.strokeWidth;
+    newOutput.strokeDashArray = oldOutput.strokeDashArray;
     newOutput.type = newType;
-    // TODO: REMOVE THIS TOMORROW
-    newOutput.widget = oldOutput.widget;
 
     oldOutput.connectors.forEach(function(connector) {
         newOutput.connectors.push(connector);
@@ -499,31 +521,81 @@ function changeOutputShape(oldOutput, newType) {
 
     var duration = 280;
     var easing = fabric.util.ease['easeInCubic'];
-    var options = generateInitialOptions(oldOutput.type, null);
+    var removalOptions = generateInitialOptions(oldOutput.type, null);
     oldOutput.configurator.tooltipster('hide');
-    animateOutputState(oldOutput, duration, easing, options);    
-    
+    animateOutputState(oldOutput, duration, easing, removalOptions);
+
     setTimeout(function() {
         canvas.remove(oldOutput);
     }, duration);
 
     canvas.add(newOutput);
     easing = fabric.util.ease['easeOutElastic'];
-    duration = 1300;
-    
-    console.log(oldOutput.widget);
-    
-    animateOutputState(newOutput, duration, easing, generateFinalOptions(newType, oldOutput.widget));
+    duration = 1500;
+
+    animateOutputState(newOutput, duration, easing, finalOptions);
+
+
     setTimeout(function() {
         addOutputDIV(newOutput);
         newOutput.configurator.tooltipster('show');
         canvas.renderAll();
-    }, duration/2);
-    
-    
-    
-    
+    }, duration / 2);
+
+    canvas.setActiveObject(newOutput);
+//    outputApplySelectedStyle(newOutput);
+
     canvas.renderAll();
+}
+
+
+
+
+// oldOutput.type and newType will always be different.
+// This function doesn't consider that a transition can be done from or to a Miniture output,
+// since this 
+function generateNewOptions(oldOutput, newType) {
+
+    if (oldOutput.type == newType)
+        return null;
+
+    var oldType = oldOutput.type;
+    var dominantVariable;
+
+    if (oldType == CIRCULAR_OUTPUT || oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT) {
+        dominantVariable = oldOutput.radius;
+    } else if (oldType == VERTICAL_RECTANGULAR_OUTPUT) {
+        dominantVariable = oldOutput.height;
+    } else if (oldType == HORIZONTAL_RECTANGULAR_OUTPUT || oldType == SQUARED_OUTPUT || oldType == MINIATURE_OUTPUT) {
+        dominantVariable = oldOutput.width;
+    }
+
+    var options = [];
+    if (newType == CIRCULAR_OUTPUT) {
+        options['radius'] = oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT ? dominantVariable : dominantVariable / 2;
+    } else if (newType == VERTICAL_RECTANGULAR_OUTPUT) {
+        options['width'] = rectangular_output_default_width;
+        options['height'] = oldType == CIRCULAR_OUTPUT || oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT ? dominantVariable * 2 : dominantVariable;
+    } else if (newType == HORIZONTAL_RECTANGULAR_OUTPUT) {
+        options['width'] = oldType == CIRCULAR_OUTPUT || oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT ? dominantVariable * 2 : dominantVariable;
+        options['height'] = rectangular_output_default_height;
+    } else if (newType == SQUARED_OUTPUT) {
+        options['width'] = oldType == CIRCULAR_OUTPUT || oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT ? dominantVariable * 2 : dominantVariable;
+        options['height'] = oldType == CIRCULAR_OUTPUT || oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT ? dominantVariable * 2 : dominantVariable;
+    } else if (newType == MINIATURE_OUTPUT) {
+        options['width'] = dominantVariable;
+        // TODO: When dealing with a miniature, we shoud also take care of the 
+    } else if (newType == TRIANGULAR_OUTPUT || newType == POLYGONAL_OUTPUT) {
+
+        var radius = oldType == CIRCULAR_OUTPUT || oldType == TRIANGULAR_OUTPUT || oldType == POLYGONAL_OUTPUT ? dominantVariable : dominantVariable / 2;
+        options['radius'] = radius;
+        options['scaleX'] = 1;
+        options['scaleY'] = 1;
+
+    }
+
+    return options;
+
 }
 
 
@@ -570,7 +642,6 @@ function addOutputDIV(output) {
         'Horizontal Rect': HORIZONTAL_RECTANGULAR_OUTPUT,
         'Square': SQUARED_OUTPUT,
         'Triangle': TRIANGULAR_OUTPUT,
-        'Miniature': MINIATURE_OUTPUT,
         'Polygon': POLYGONAL_OUTPUT
     };
 
@@ -579,6 +650,7 @@ function addOutputDIV(output) {
     for (var val in outputShapes) {
 //        console.log(val + ": " + connector.output.type + " - " + (val == connector.output.type));
         $('<option />', {value: val, text: outputShapes[val], selected: (val == output.type)}).appendTo(outputShapeSelector);
+
     }
 
     var configurationPanel = $('<div/>');
@@ -753,25 +825,41 @@ function generateFinalCircularOptions(widget) {
     return generateFinalPolygonalOptions(widget);
 }
 
-function generateInitialPolygonalOptions(widget, nSides) {
+function generateInitialPolygonalOptions(widgetOrRadius, nSides) {
 
     var options = {};
 
-    if (widget != null) {
-        var divisor = 600;
-        var r = widget.contourArea / divisor;
-        var points = new Array();
-        var theta = -Math.PI / 2;
-        var i;
-        for (i = 0; i < nSides; i++) {
-            points.push({x: r * Math.cos(2 * Math.PI * i / nSides + theta), y: r * Math.sin(2 * Math.PI * i / nSides + theta)});
+    if (widgetOrRadius != null) {
+
+        if (widgetOrRadius.contourArea) {
+            var divisor = 600;
+            var radius = widgetOrRadius.contourArea / divisor;
+            var points = new Array();
+            var theta = -Math.PI / 2;
+            var i;
+            for (i = 0; i < nSides; i++) {
+                points.push({x: radius * Math.cos(2 * Math.PI * i / nSides + theta), y: radius * Math.sin(2 * Math.PI * i / nSides + theta)});
+            }
+            options['points'] = points;
+            options['nSides'] = nSides;
+            options['radius'] = radius;
+        } else {
+            var radius = widgetOrRadius;
+            var points = new Array();
+            var theta = -Math.PI / 2;
+            var i;
+            for (i = 0; i < nSides; i++) {
+                points.push({x: radius * Math.cos(2 * Math.PI * i / nSides + theta), y: radius * Math.sin(2 * Math.PI * i / nSides + theta)});
+            }
+            options['points'] = points;
+            options['nSides'] = nSides;
+            options['radius'] = radius;
         }
-        options['points'] = points;
+
     }
 
     options['scaleX'] = 0;
     options['scaleY'] = 0;
-
 
     return options;
 }
