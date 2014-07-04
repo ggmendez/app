@@ -60,8 +60,9 @@ function outputMoving(option, output, parentGroup) {
         }
         positionConnectorConfigurator(connector);
         positionOutputConfigurator(output);
+        canvas.renderAll();
     });
-    canvas.renderAll();
+    
 }
 
 function outputScaling(option, output, parentGroup) {
@@ -202,117 +203,117 @@ function createGenericOutput(x, y, widget, outputType, options) {
 }
 
 
-function addCircularOutput(x, y, widget, theConnectors, shouldAddConfigurator, actionType) {
+//function addCircularOutput(x, y, widget, theConnectors, shouldAddConfigurator, actionType) {
+//
+//    var initialRadius = 1;
+//    var finalRadius = widget.contourArea / 600;
+//    var duration = 1300;
+//    var output = createCircularOutput(x, y, initialRadius, widget.trueColor);
+//    output.type = CIRCULAR_OUTPUT;
+//
+//    theConnectors.forEach(function(connector) {
+//        connector.output = output;
+//    });
+//
+//    output.connectors = theConnectors;
+//
+//    associateOutputEvents(output);
+//
+//    canvas.add(output);
+//
+//    if (shouldAddConfigurator) {
+//        addConnectorConfigurator(getLastElementOfArray(output.connectors));
+//    }
+//
+//    animateCircularOutput(output, theConnectors, finalRadius, duration, false, null, actionType);
+//
+//    return output;
+//}
 
-    var initialRadius = 1;
-    var finalRadius = widget.contourArea / 600;
-    var duration = 1300;
-    var output = createCircularOutput(x, y, initialRadius, widget.trueColor);
-    output.type = CIRCULAR_OUTPUT;
+//function animateCircularOutput(output, theConnectors, radius, duration, sendToBack, newType, actionType) {
+//
+//    var coordX = output.left;
+//    var coordY = output.top;
+//    var targetWidget = getLastElementOfArray(theConnectors).widget;
+//
+//    var easing = fabric.util.ease['easeOutElastic'];
+//
+//    if (actionType == DELETING_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
+//        easing = fabric.util.ease['easeInCubic'];
+//    }
+//
+//    output.animate('radius', radius, {
+//        duration: duration,
+//        onChange: canvas.renderAll.bind(canvas),
+//        onComplete: function() {
+//            if (sendToBack) {
+//                canvas.sendToBack(output);
+//            }
+//            output.scaleX = 1;
+//            output.scaleY = 1;
+//
+//            if (actionType == DELETING_OUTPUT) {
+//                deleteConnectors(output);
+//            }
+//
+//            if (actionType == ADDING_NEW_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
+//                addOutputDIV(output);
+//            }
+//
+//        },
+//        easing: easing
+//    });
+//
+//    if (newType != null) {
+//        addOutput(coordX, coordY, targetWidget, theConnectors, false, newType, REPLACING_EXISTING_OUTPUT);
+//    }
+//
+//
+//}
 
-    theConnectors.forEach(function(connector) {
-        connector.output = output;
-    });
-
-    output.connectors = theConnectors;
-
-    associateOutputEvents(output);
-
-    canvas.add(output);
-
-    if (shouldAddConfigurator) {
-        addConnectorConfigurator(getLastElementOfArray(output.connectors));
-    }
-
-    animateCircularOutput(output, theConnectors, finalRadius, duration, false, null, actionType);
-
-    return output;
-}
-
-function animateCircularOutput(output, theConnectors, radius, duration, sendToBack, newType, actionType) {
-
-    var coordX = output.left;
-    var coordY = output.top;
-    var targetWidget = getLastElementOfArray(theConnectors).widget;
-
-    var easing = fabric.util.ease['easeOutElastic'];
-
-    if (actionType == DELETING_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
-        easing = fabric.util.ease['easeInCubic'];
-    }
-
-    output.animate('radius', radius, {
-        duration: duration,
-        onChange: canvas.renderAll.bind(canvas),
-        onComplete: function() {
-            if (sendToBack) {
-                canvas.sendToBack(output);
-            }
-            output.scaleX = 1;
-            output.scaleY = 1;
-
-            if (actionType == DELETING_OUTPUT) {
-                deleteConnectors(output);
-            }
-
-            if (actionType == ADDING_NEW_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
-                addOutputDIV(output);
-            }
-
-        },
-        easing: easing
-    });
-
-    if (newType != null) {
-        addOutput(coordX, coordY, targetWidget, theConnectors, false, newType, REPLACING_EXISTING_OUTPUT);
-    }
-
-
-}
-
-function animateRectangularOutput(output, theConnectors, width, height, duration, sendToBack, newType, actionType) {
-
-    var coordX = output.left;
-    var coordY = output.top;
-    var targetWidget = getLastElementOfArray(theConnectors).widget;
-
-    var easing = fabric.util.ease['easeOutBounce'];
-
-    if (actionType == DELETING_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
-        easing = fabric.util.ease['easeInCubic'];
-    }
-
-    output.animate('height', height, {
-        duration: duration,
-        onChange: canvas.renderAll.bind(canvas),
-        easing: easing
-    });
-    output.animate('width', width, {
-        duration: duration,
-        onChange: canvas.renderAll.bind(canvas),
-        onComplete: function() {
-            if (sendToBack) {
-                canvas.sendToBack(output);
-            }
-            output.scaleX = 1;
-            output.scaleY = 1;
-
-            if (actionType == DELETING_OUTPUT) {
-                deleteConnectors(output);
-            }
-
-            if (actionType == ADDING_NEW_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
-                addOutputDIV(output);
-            }
-
-        },
-        easing: easing
-    });
-
-    if (newType != null) {
-        addOutput(coordX, coordY, targetWidget, theConnectors, false, newType, actionType);
-    }
-}
+//function animateRectangularOutput(output, theConnectors, width, height, duration, sendToBack, newType, actionType) {
+//
+//    var coordX = output.left;
+//    var coordY = output.top;
+//    var targetWidget = getLastElementOfArray(theConnectors).widget;
+//
+//    var easing = fabric.util.ease['easeOutBounce'];
+//
+//    if (actionType == DELETING_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
+//        easing = fabric.util.ease['easeInCubic'];
+//    }
+//
+//    output.animate('height', height, {
+//        duration: duration,
+//        onChange: canvas.renderAll.bind(canvas),
+//        easing: easing
+//    });
+//    output.animate('width', width, {
+//        duration: duration,
+//        onChange: canvas.renderAll.bind(canvas),
+//        onComplete: function() {
+//            if (sendToBack) {
+//                canvas.sendToBack(output);
+//            }
+//            output.scaleX = 1;
+//            output.scaleY = 1;
+//
+//            if (actionType == DELETING_OUTPUT) {
+//                deleteConnectors(output);
+//            }
+//
+//            if (actionType == ADDING_NEW_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
+//                addOutputDIV(output);
+//            }
+//
+//        },
+//        easing: easing
+//    });
+//
+//    if (newType != null) {
+//        addOutput(coordX, coordY, targetWidget, theConnectors, false, newType, actionType);
+//    }
+//}
 
 function animateMiniatureOutput(output, connector, scaleX, scaleY, duration, sendToBack, newType, actionType) {
 
@@ -340,7 +341,7 @@ function animateMiniatureOutput(output, connector, scaleX, scaleY, duration, sen
             }
 
             if (actionType == DELETING_OUTPUT) {
-                deleteConnectors(output);
+                outputDeleteConnectors(output);
             }
 
             if (actionType == ADDING_NEW_OUTPUT || actionType == REPLACING_EXISTING_OUTPUT) {
@@ -444,9 +445,12 @@ function addConnectorConfigurator(connector) {
 
 
 function animateOutputState(output, duration, easing, finalStateOptions) {
+    
+    console.log("animateOutputState");
+    
     for (var key in finalStateOptions) {
         var value = finalStateOptions[key];
-        output.animate(key, value, {
+        output.animate('' + key, value, {
             duration: duration,
             onChange: canvas.renderAll.bind(canvas),
             easing: easing
@@ -460,11 +464,11 @@ function animateOutputState(output, duration, easing, finalStateOptions) {
 // A DOM configurator is added at the mid point of the connector path.
 function addOutputAt(x, y, widget, connector, outputType) {
 
-    var options = generateInitialOptions(outputType, widget);
+    var initialOptions = generateInitialOptions(outputType, widget);
 
-    console.log(options);
+    console.log(initialOptions);
 
-    var output = createGenericOutput(x, y, widget, outputType, options);
+    var output = createGenericOutput(x, y, widget, outputType, initialOptions);
 
     output.type = outputType;
     output.connectors.push(connector);
@@ -477,8 +481,13 @@ function addOutputAt(x, y, widget, connector, outputType) {
 
     var easing = fabric.util.ease['easeOutElastic'];
     var duration = 1300;
+    
+    var finalOptions = generateFinalOptions(outputType, widget);
+    
+    console.log("finalOptions:");
+    console.log(finalOptions);
 
-    animateOutputState(output, duration, easing, generateFinalOptions(outputType, widget));
+    animateOutputState(output, duration, easing, finalOptions);
 
     setTimeout(function() {
         addOutputDIV(output);
@@ -499,6 +508,9 @@ function changeOutputShape(oldOutput, newType) {
     }
 
     var finalOptions = generateNewOptions(oldOutput, newType);
+    
+//    console.log("finalOptions");
+//    console.log(finalOptions);
 
     var polygonalInitialOptions = generateInitialPolygonalOptions(finalOptions['radius'], nSides);
 
@@ -685,6 +697,8 @@ function removeOutput(output, newType, actionType) {
 
     if (output == null)
         return;
+    
+    outputDeleteConnectors(output);
 
     var minimunValue = 0;
     var duration = 280;
@@ -713,49 +727,51 @@ function removeOutput(output, newType, actionType) {
 
         animateMiniatureOutput(output, output.connectors, 0, 0, duration, true, newType, actionType);
     }
+    
+    
 
 }
 
 
-function addRectangularOutput(x, y, widget, theConnectors, shouldAddConfigurator, rectangleType, actionType) {
-
-    var initialWidth = 1;
-    var initialHeight = 1;
-    var finalWidth = 25;
-    var finalHeight = 30;
-    var phi = 1.5; // Rectangular golden ratio
-    var divisor = 600;
-
-    if (rectangleType == HORIZONTAL_RECTANGULAR_OUTPUT) {
-        finalWidth = 2 * widget.contourArea / divisor * phi;
-    } else if (rectangleType == VERTICAL_RECTANGULAR_OUTPUT) {
-        finalHeight = 2 * widget.contourArea / divisor * phi;
-    } else if (rectangleType == SQUARED_OUTPUT) {
-        finalWidth = 2 * widget.contourArea / divisor;
-        finalHeight = finalWidth;
-    }
-
-    var duration = 800;
-    var output = createRectangularOutput(x, y, initialWidth, initialHeight, widget.trueColor);
-    output.type = rectangleType;
-
-    output.connectors = theConnectors;
-    theConnectors.forEach(function(connector) {
-        connector.output = output;
-    });
-
-    associateOutputEvents(output);
-
-    canvas.add(output);
-
-    if (shouldAddConfigurator) {
-        addConnectorConfigurator(getLastElementOfArray(output.connectors));
-    }
-
-    animateRectangularOutput(output, theConnectors, finalWidth, finalHeight, duration, false, null, actionType);
-
-    return output;
-}
+//function addRectangularOutput(x, y, widget, theConnectors, shouldAddConfigurator, rectangleType, actionType) {
+//
+//    var initialWidth = 1;
+//    var initialHeight = 1;
+//    var finalWidth = 25;
+//    var finalHeight = 30;
+//    var phi = 1.5; // Rectangular golden ratio
+//    var divisor = 600;
+//
+//    if (rectangleType == HORIZONTAL_RECTANGULAR_OUTPUT) {
+//        finalWidth = 2 * widget.contourArea / divisor * phi;
+//    } else if (rectangleType == VERTICAL_RECTANGULAR_OUTPUT) {
+//        finalHeight = 2 * widget.contourArea / divisor * phi;
+//    } else if (rectangleType == SQUARED_OUTPUT) {
+//        finalWidth = 2 * widget.contourArea / divisor;
+//        finalHeight = finalWidth;
+//    }
+//
+//    var duration = 800;
+//    var output = createRectangularOutput(x, y, initialWidth, initialHeight, widget.trueColor);
+//    output.type = rectangleType;
+//
+//    output.connectors = theConnectors;
+//    theConnectors.forEach(function(connector) {
+//        connector.output = output;
+//    });
+//
+//    associateOutputEvents(output);
+//
+//    canvas.add(output);
+//
+//    if (shouldAddConfigurator) {
+//        addConnectorConfigurator(getLastElementOfArray(output.connectors));
+//    }
+//
+//    animateRectangularOutput(output, theConnectors, finalWidth, finalHeight, duration, false, null, actionType);
+//
+//    return output;
+//}
 
 
 function generateInitialOptions(outputType, widget) {
@@ -788,8 +804,8 @@ function generateFinalOptions(outputType, widget) {
 
 function generateInitialRectangularOptions(rectangleType, widget) {
     var options = {};
-    options['width'] = 1;
-    options['height'] = 1;
+    options['width'] = 0;
+    options['height'] = 0;
     if (rectangleType == HORIZONTAL_RECTANGULAR_OUTPUT) {
         options['height'] = rectangular_output_default_height;
     } else if (rectangleType == VERTICAL_RECTANGULAR_OUTPUT) {
@@ -804,10 +820,13 @@ function generateFinalRectangularOptions(rectangleType, widget) {
     var options = {};
     if (rectangleType == HORIZONTAL_RECTANGULAR_OUTPUT) {
         options['width'] = widget != null ? 2 * widget.contourArea / divisor * phi : 0;
-        options['height'] = rectangular_output_default_height;
+//        options['height'] = rectangular_output_default_height;
     } else if (rectangleType == VERTICAL_RECTANGULAR_OUTPUT) {
         options['height'] = widget != null ? 2 * widget.contourArea / divisor * phi : 0;
-        options['width'] = rectangular_output_default_width;
+//        options['width'] = rectangular_output_default_width;
+    } else if (rectangleType == SQUARED_OUTPUT) {
+        options['height'] = widget != null ? 2 * widget.contourArea / divisor * phi : 0;
+        options['width'] = widget != null ? 2 * widget.contourArea / divisor * phi : 0;
     }
     return options;
 }
@@ -978,17 +997,12 @@ function addMiniatureOutput(x, y, widget, connector, shouldAddConfigurator) {
 
 
 
-function deleteConnectors(output) {
+function outputDeleteConnectors(output) {
 
-    console.log("FUNCTION: deleteConnectors");
-
-    var connector = output.connector;
-    output = null
-    connector.output = null
-    removeConnector(connector);
-//        output.connectors.forEach(function(connector) {
-//            removeConnector(connector);
-//        });
+    console.log("FUNCTION: deleteConnectors");    
+    output.connectors.forEach(function(connector) {
+        removeConnector(connector);
+    });
 }
 
 function associateOutputEvents(output) {

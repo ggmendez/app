@@ -145,11 +145,13 @@ function canvasObjectScaling(option) {
 }
 
 function canvasObjectMoving(option) {
-    
-    
+
+
 
     console.log("canvasObjectMoving");
-    
+
+
+
     console.log(option);
 
     if (option.target._objects) {
@@ -230,9 +232,27 @@ function canvasPathCreated(option) {
 }
 
 function canvasMouseDown(option) {
-//    console.log("canvasMouseDown");
-    var event = option['e'];
-    event.preventDefault();
+    
+    console.log("canvasMouseDown");
+    console.log(typeof option);
+
+    var event = option;
+
+    if (fabric.isTouchSupported && event.touches && event.changedTouches) {
+        event = option['e'];
+        console.log("ON the canvas: " + event.touches.length);
+        console.log("changed: " + event.changedTouches.length);
+
+    }
+
+
+
+
+
+
+
+
+
 }
 
 function canvasMouseMove(option) {

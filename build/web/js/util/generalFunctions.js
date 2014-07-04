@@ -1,3 +1,9 @@
+function findElementPosition(array, element) {
+    return $.grep(array, function(currentElement) {
+        return currentElement === element;
+    });
+}
+
 function getLastElementOfArray(array) {
     return array[array.length-1];
 }

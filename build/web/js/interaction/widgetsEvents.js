@@ -63,17 +63,33 @@ function widgetScaling(option, targetWidget) {
 }
 function widgetMoving(option, targetWidget, parentGroup) {
 
+    console.log("option:");
+    console.log(option);
+
     console.log("widgetMoving");
+
     targetWidget.moving = true;
 
     var theEvent = option;
+    if (fabric.isTouchSupported) {
+        theEvent = option['e'];
+    }
 
-    theEvent = option['e'];
+    console.log("theEvent:");
+    console.log(theEvent);
+
+    theEvent.preventDefault();
 
     if (theEvent) {
 
-        var coordY = theEvent.offsetY;
         var coordX = theEvent.offsetX;
+        var coordY = theEvent.offsetY;
+
+//        var coordX = theEvent.offsetX != undefined ? theEvent.offsetX : theEvent.layerX;
+//        var coordY = theEvent.offsetY != undefined ? theEvent.offsetY : theEvent.layerY;
+
+        console.log("coordX: " + coordX);
+        console.log("coordY: " + coordY);
 
         if (fabric.isTouchSupported && theEvent.changedTouches && theEvent.changedTouches.length > 0) {
             // Here I use the changedTouches list since the up event produces a change in it
@@ -99,9 +115,9 @@ function widgetMousedown(option, targetWidget) {
     console.log("widgetMousedown");
 
     var theEvent = option;
-//    if (fabric.isTouchSupported) {
-    theEvent = option['e'];
-//    }
+    if (fabric.isTouchSupported) {
+        theEvent = option['e'];
+    }
 
     if (theEvent) {
 
@@ -126,6 +142,9 @@ function widgetMousedown(option, targetWidget) {
 function widgetMouseup(option, targetWidget) {
 
     console.log("widgetMouseup");
+    console.log(option);
+
+
     if (targetWidget.permanentOpacity) {
         targetWidget.opacity = targetWidget.permanentOpacity;
     } else {
@@ -134,7 +153,10 @@ function widgetMouseup(option, targetWidget) {
 
     if (targetWidget.moving) {
 
-        var theEvent = option['e'];
+        var theEvent = option;
+        if (fabric.isTouchSupported) {
+            theEvent = option['e'];
+        }
 
         if (theEvent) {
 
@@ -147,30 +169,29 @@ function widgetMouseup(option, targetWidget) {
                 coordY = theEvent.changedTouches[0].pageY - $('#theCanvas').offset().top;
             }
 
+            // If the user does not drag to a point that is out of the widget
+            var point = new fabric.Point(coordX, coordY);
+            if (targetWidget.containsPoint(point)) {
+                var connector = targetWidget.connectors.pop();
+                canvas.remove(connector);
+                return;
+            }
+
+
             var existingOutput = getOutputContaining(coordX, coordY);
 
             // The mouse up event is done over a blank section of the canvas
             if (existingOutput == null) {
 
-//                console.log(targetWidget.connectors);
-
                 var lastAddedConnector = getLastElementOfArray(targetWidget.connectors);
 
-//                console.log(lastAddedConnector);
-
-                var arrayOfConnectors = new Array(lastAddedConnector);
-
-//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, CIRCULAR_OUTPUT);
-                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, TRIANGULAR_OUTPUT);
+                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, CIRCULAR_OUTPUT);
+//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, TRIANGULAR_OUTPUT);
 //                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, VERTICAL_RECTANGULAR_OUTPUT);
 //                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, HORIZONTAL_RECTANGULAR_OUTPUT);
+//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, SQUARED_OUTPUT);
+//                addOutputAt(coordX, coordY, targetWidget, lastAddedConnector, POLYGONAL_OUTPUT);
 
-//                addOutput(coordX, coordY, targetWidget, arrayOfConnectors, true, CIRCULAR_OUTPUT, ADDING_NEW_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, VERTICAL_RECTANGULAR_OUTPUT, ADDING_NEW_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, HORIZONTAL_RECTANGULAR_OUTPUT, ADDING_NEW_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, SQUARED_OUTPUT, ADDING_NEW_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, TRIANGULAR_OUTPUT, ADDING_NEW_OUTPUT);
-//            addOutput (coordX, coordY, targetWidget, arrayOfConnectors, true, MINIATURE_OUTPUT, ADDING_NEW_OUTPUT);
 
             } else {
                 // if the mouse up event happens over an existing output
@@ -195,7 +216,7 @@ function widgetMouseup(option, targetWidget) {
 
 function animateWidget(widget, top, left, duration) {
 
-    
+
 
 //    var easing = fabric.util.ease.easeOutExpo;
 

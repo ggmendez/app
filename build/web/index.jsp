@@ -251,7 +251,7 @@
                 $('.tooltip').tooltipster();
             });
 
-            
+
 //            $.fn.tooltipster('setDefaults', {                
 //                delay: 0
 //            });
@@ -443,9 +443,9 @@
                 'mouse:up': function(option) {
                     canvasMouseUp(option);
                 },
-//                'object:moving': function(option) {
-//                    canvasObjectMoving(option);
-//                },
+                'object:moving': function(option) {
+                    canvasObjectMoving(option);
+                },
                 'object:modified': function(option) {
                     canvasObjectModified(option);
                 },

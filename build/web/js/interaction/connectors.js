@@ -14,13 +14,14 @@ function CreateDefaultConnector(coords, color) {
     });
 }
 
-function removeConnector (connector) {
-    // removing the configurator associated to this connector    
+function removeConnector(connector) {
+    // removing the configurator associated to this connector
     connector.configurator.remove();
-    canvas.remove(connector);
-    
-    if (connector.output != null){
-        removeOutput(connector.output);
+    var pos = findElementPosition(connector.widget.connectors, connector);
+    if (pos.length != 0) {
+        connector.widget.connectors.splice(pos[0],1);
     }
-    
+    canvas.remove(connector);
+    canvas.renderAll();    
 }
+
